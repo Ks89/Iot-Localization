@@ -1,10 +1,3 @@
-/**
- *  Configuration file for wiring of sendAckC module to other common 
- *  components needed for proper functioning
- *
- *  @author Luca Pietro Borsani
- */
-
 #include "sendAck.h"
 
 configuration sendAckAppC {}

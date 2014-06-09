@@ -1,10 +1,3 @@
-/**
- *  Configuration file for wiring of FakeSensorP module to other common 
- *  components to simulate the behavior of a real sensor
- *
- *  @author Luca Pietro Borsani
- */
- 
 generic configuration FakeSensorC() {
 
 	provides interface Read<uint16_t>;

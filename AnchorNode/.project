@@ -13,5 +13,6 @@
 	</buildSpec>
 	<natures>
 		<nature>tinyos.yeti.core.TinyOSProject</nature>
+		<nature>org.eclipse.cdt.core.cnature</nature>
 	</natures>
 </projectDescription>

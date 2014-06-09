@@ -1,7 +1,3 @@
-/**
- *  @author Luca Pietro Borsani
- */
-
 #ifndef SENDACK_H
 #define SENDACK_H
 
