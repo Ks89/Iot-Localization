@@ -1,5 +1,5 @@
 #include "ApplicationDefinitions.h"
-#include "RssiDemoMessages.h" 
+#include "Message.h" 
 #include "printf.h" 
 
 module RssiBaseC {
@@ -15,9 +15,9 @@ implementation {
   event bool RssiMsgIntercept.forward(message_t *msg,
 				      void *payload,
 				      uint8_t len) {
-    RssiMsg *rssiMsg = (RssiMsg*) payload;
-    rssiMsg->rssi = getRssi(msg);
-    printf("valore %d\n", rssiMsg->rssi);
+    nodeMessage_t *message = (nodeMessage_t*) payload;
+    message->rssi = getRssi(msg);
+    printf("valore %d\n", message->rssi);
     
     return TRUE;
   }

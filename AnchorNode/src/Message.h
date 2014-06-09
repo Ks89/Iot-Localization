@@ -1,12 +1,12 @@
 #ifndef SENDACK_H
 #define SENDACK_H
 
-typedef nx_struct my_msg {
+typedef nx_struct NodeMessage {
 	nx_uint8_t msg_type;
 	nx_uint16_t msg_id;
 	nx_uint16_t value;
 	nx_int16_t rssi;
-} my_msg_t;
+} nodeMessage_t;
 
 #define REQ 1
 #define RESP 2

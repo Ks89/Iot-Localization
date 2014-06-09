@@ -1,4 +1,4 @@
-#include "RssiDemoMessages.h"
+#include "Message.h"
 #include "message.h"
 #define NEW_PRINTF_SEMANTICS
 #include "printf.h"

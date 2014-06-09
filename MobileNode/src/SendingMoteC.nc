@@ -1,5 +1,5 @@
 #include "ApplicationDefinitions.h"
-#include "RssiDemoMessages.h"
+#include "Message.h"
 
 module SendingMoteC {
   uses interface Boot;
@@ -25,7 +25,7 @@ implementation {
 
 
   event void SendTimer.fired(){
-    call RssiMsgSend.send(AM_BROADCAST_ADDR, &msg, sizeof(RssiMsg));    
+    call RssiMsgSend.send(AM_BROADCAST_ADDR, &msg, sizeof(nodeMessage_t));    
   }
 
   event void RssiMsgSend.sendDone(message_t *m, error_t error){}

@@ -1,4 +1,4 @@
-#include "RssiDemoMessages.h"
+#include "Message.h"
 
 configuration SendingMoteAppC {
 }
