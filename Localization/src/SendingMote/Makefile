@@ -1,7 +1,0 @@
-COMPONENT=SendingMoteAppC
-
-INCLUDES= -I..
-
-CFLAGS += $(INCLUDES)
-
-include $(MAKERULES)

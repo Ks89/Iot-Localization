@@ -33,32 +33,18 @@
  * @author Dimas Abreu Dutra
  */
 
-#include "ApplicationDefinitions.h"
 #include "RssiDemoMessages.h"
+#include "message.h"
+#define NEW_PRINTF_SEMANTICS
+#include "printf.h"
 
-module SendingMoteC {
-  uses interface Boot;
-  uses interface Timer<TMilli> as SendTimer;
-  
-  uses interface AMSend as RssiMsgSend;
-  uses interface SplitControl as RadioControl;
+configuration RssiBaseAppC {
 } implementation {
-  message_t msg;
-  
-  event void Boot.booted(){
-    call RadioControl.start();
-  }
+  components BaseStationC;
+components PrintfC;
+  components RssiBaseC as App;
 
-  event void RadioControl.startDone(error_t result){
-    call SendTimer.startPeriodic(SEND_INTERVAL_MS);
-  }
-
-  event void RadioControl.stopDone(error_t result){}
-
-
-  event void SendTimer.fired(){
-    call RssiMsgSend.send(AM_BROADCAST_ADDR, &msg, sizeof(RssiMsg));    
-  }
-
-  event void RssiMsgSend.sendDone(message_t *m, error_t error){}
+  components CC2420ActiveMessageC;
+  App -> CC2420ActiveMessageC.CC2420Packet;
+  App-> BaseStationC.RadioIntercept[AM_RSSIMSG];
 }

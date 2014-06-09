@@ -33,31 +33,11 @@
  * @author Dimas Abreu Dutra
  */
 
-#include "ApplicationDefinitions.h"
-#include "RssiDemoMessages.h" 
-#include "printf.h" 
+#ifndef APPLICATIONDEFINITIONS_H__
+#define APPLICATIONDEFINITIONS_H__
 
-module RssiBaseC {
-  uses interface Intercept as RssiMsgIntercept;
+enum {
+  SEND_INTERVAL_MS = 250
+};
 
-  uses interface CC2420Packet;
-}
-
-implementation {
-
-  uint16_t getRssi(message_t *msg);
-  
-  event bool RssiMsgIntercept.forward(message_t *msg,
-				      void *payload,
-				      uint8_t len) {
-    RssiMsg *rssiMsg = (RssiMsg*) payload;
-    rssiMsg->rssi = getRssi(msg);
-	printf("Timer2 fired e ora dico cazzate inutili!!\n");
-    
-    return TRUE;
-  }
-
-  uint16_t getRssi(message_t *msg){
-    return (uint16_t) call CC2420Packet.getRssi(msg);
-  }
-}
+#endif //APPLICATIONDEFINITIONS_H__

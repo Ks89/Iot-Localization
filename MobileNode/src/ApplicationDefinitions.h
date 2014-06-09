@@ -33,17 +33,11 @@
  * @author Dimas Abreu Dutra
  */
 
-#include "RssiDemoMessages.h"
-#include "message.h"
-#define NEW_PRINTF_SEMANTICS
-#include "printf.h"
+#ifndef APPLICATIONDEFINITIONS_H__
+#define APPLICATIONDEFINITIONS_H__
 
-configuration RssiBaseAppC {
-} implementation {
-  components BaseStationC;
-  components RssiBaseC as App;
+enum {
+  SEND_INTERVAL_MS = 250
+};
 
-  components CC2420ActiveMessageC;
-  App -> CC2420ActiveMessageC.CC2420Packet;
-  App-> BaseStationC.RadioIntercept[AM_RSSIMSG];
-}
+#endif //APPLICATIONDEFINITIONS_H__
