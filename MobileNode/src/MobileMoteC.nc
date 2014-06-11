@@ -36,14 +36,13 @@ implementation {
   
     //***************** SplitControl interface ********************//
   event void RadioControl.startDone(error_t err){
-		call MilliTimer.startPeriodic( 0 );
+		call MilliTimer.startOneShot( 0 );
   }
   
   event void RadioControl.stopDone(error_t err){}
 
   //***************** MilliTimer interface ********************//
   event void MilliTimer.fired() {
-  	call MilliTimer.stop();
 	sendReq();
   }
 
@@ -54,7 +53,7 @@ implementation {
 	mess->msg_type = REQ;
 	mess->mode_type = MOBILE;
 	call AMSend.send(AM_BROADCAST_ADDR, &packet , sizeof(nodeMessage_t));
-	call MilliTimer.startPeriodic( SEND_INTERVAL_MS );
+	call MilliTimer.startOneShot( SEND_INTERVAL_MOBILE );
   }
 
   //********************* AMSend interface ****************//

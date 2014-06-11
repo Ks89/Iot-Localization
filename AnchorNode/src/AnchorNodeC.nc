@@ -21,6 +21,7 @@ implementation {
   
   uint16_t RSSI;
   uint16_t source;
+  uint16_t slot_size; //in milliseconds
   
   message_t packet;
   nodeMessage_t* message; 
@@ -32,6 +33,11 @@ implementation {
   
   event void Boot.booted() {
 	printf("Base booted...\n");
+	
+	slot_size = SEND_INTERVAL_MOBILE / ANCHOR_NODE_NUMBER;
+	
+	printf("Slot size: %d", slot_size);
+	
 	call RadioControl.start();
   }
   
@@ -53,15 +59,21 @@ implementation {
 	if(message->mode_type == MOBILE) {
 		source = call AMPacket.source(buf);
 		RSSI = getRSSI(buf);
-		printf("RSSI: %d\n",RSSI);
+		printf("Source ID=%d, RSSI: %d\n",source, RSSI);
 			
 		if ( message->msg_type == REQ ) {
-			call MilliTimer.startPeriodic( SEND_INTERVAL_MS );
+			
+			//invio il messaggio allo scattare del timer, 
+			//dopo un intervallo dato dalla formula.
+			//NB: (SEND_INTERVAL_MOBILE /10) serve per far si che 
+			//l'ultimo nodo non mandi proprio quando il MobileNode manda il nuovo 
+			//pacchetto, cioe' dopo SEND_INTERVAL_MOBILE.
+			//Per 8 nodi i ritardi sono:
+			//25-150-275-400-525-650-775-900
+			call MilliTimer.startOneShot((slot_size * TOS_NODE_ID) - (SEND_INTERVAL_MOBILE /10));
 		}
 	}
     return buf;
-
-
   }
   
   
@@ -69,7 +81,7 @@ implementation {
   
   //***************** MilliTimer interface ********************//
   event void MilliTimer.fired() {
-  	call MilliTimer.stop();
+  	//call MilliTimer.stop();
 	sendPacket();
   }
   
@@ -81,7 +93,7 @@ implementation {
 	mess->rssi = RSSI;
 	mess->mode_type = ANCHOR;
 	 
-	printf("Try to send a response to mobile node... \n");
+	printf("Node ID=%d -> Try to send a response to mobile node... \n", TOS_NODE_ID);
 	call AMSend.send(source,&packet,sizeof(nodeMessage_t));
 
 
