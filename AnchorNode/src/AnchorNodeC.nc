@@ -36,7 +36,7 @@ implementation {
 	
 	slot_size = SEND_INTERVAL_MOBILE / ANCHOR_NODE_NUMBER;
 	
-	printf("Slot size: %d", slot_size);
+	printf("Slot size: %d\n", slot_size);
 	
 	call RadioControl.start();
   }
