@@ -6,6 +6,7 @@
 <target>telosb</target>
 <make-extras/>
 <includes>
+<include global="false" include="system" ncc="true" recursive="false">/opt/tinyos-2.1.2/tos/lib/timer</include>
 <include global="false" include="system" ncc="true" recursive="false">/opt/tinyos-2.1.2/tos/lib/printf</include>
 </includes>
 <excludes>
@@ -16,7 +17,7 @@
 <boards/>
 <no-std-incl>false</no-std-incl>
 <component/>
-<component-file>/AnchorNode/src/RssiBaseAppC.nc</component-file>
+<component-file>/AnchorNode/src/AnchorNodeAppC.nc</component-file>
 <include-last-build>true</include-last-build>
 <include-env-default-paths>true</include-env-default-paths>
 <environment_variables/>

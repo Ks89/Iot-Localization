@@ -6,7 +6,9 @@
 <target>telosb</target>
 <make-extras/>
 <includes>
+<include global="false" include="system" ncc="true" recursive="false">/opt/tinyos-2.1.2/tos/lib/timer</include>
 <include global="false" include="system" ncc="true" recursive="false">/opt/tinyos-2.1.2/tos/lib/printf</include>
+<include global="false" include="system" ncc="true" recursive="false">/opt/tinyos-2.1.2/tos/chips/cc2420</include>
 </includes>
 <excludes>
 <exclude>.*\.svn.*</exclude>
