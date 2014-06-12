@@ -3,6 +3,7 @@
 #include "Timer.h"
 #define NEW_PRINTF_SEMANTICS
 #include "printf.h" 
+#include "math.h"
 
 module MobileMoteC {
   
@@ -23,18 +24,17 @@ implementation {
 	
   struct rssiArrayElement {
   	int nodeId;
-  	uint16_t rssiVal;
+  	int16_t rssiVal;
   };
 	 
   struct rssiArrayElement RSSI_array[8];
-  struct rssiArrayElement firstEl, secondEl, thirdEl;
+  struct rssiArrayElement firstEl={-999,-999}, secondEl={-999,-999}, thirdEl={-999,-999};
   
   message_t packet;
   
   void calcDistance();
   void sendReq();
   void initRssiArray();
-
   
     //***************** Boot interface ********************//
   event void Boot.booted() {
@@ -94,26 +94,32 @@ implementation {
 		//allora posso cercare i tre migliori e calcolare distanza
 		if(sourceNodeId == ANCHOR_NODE_NUMBER) {
 			int j;
-			firstEl = RSSI_array[0];
-			secondEl = RSSI_array[0];
-			thirdEl = RSSI_array[0];
+			//metto tutto a 0 (per ora, poi mettere a -999)
+			firstEl.nodeId=0;
+			firstEl.rssiVal=0;
+			secondEl.nodeId=0;
+			secondEl.rssiVal=0;
+			thirdEl.nodeId=0;
+			thirdEl.rssiVal=0;
 			
-			for(j=1; j<ANCHOR_NODE_NUMBER; ++j) {
+			for(j=0; j<ANCHOR_NODE_NUMBER; ++j) {
 				if(RSSI_array[j].rssiVal>firstEl.rssiVal) {
 					firstEl = RSSI_array[j];
 				}
 			}
-			for(j=1; j<ANCHOR_NODE_NUMBER; ++j) {
-				if(RSSI_array[j].rssiVal>secondEl.rssiVal && j!=firstEl.nodeId-1) {
+			RSSI_array[firstEl.nodeId-1].rssiVal = 0;
+			for(j=0; j<ANCHOR_NODE_NUMBER; ++j) {
+				if(RSSI_array[j].rssiVal>secondEl.rssiVal ) {
 					secondEl = RSSI_array[j];
 				}
 			}
-			for(j=1; j<ANCHOR_NODE_NUMBER ; ++j) {
-				if(RSSI_array[j].rssiVal>thirdEl.rssiVal && j!=firstEl.nodeId-1 && j!=secondEl.nodeId-1) {
+			RSSI_array[secondEl.nodeId-1].rssiVal = 0;
+			for(j=0; j<ANCHOR_NODE_NUMBER ; ++j) {
+				if(RSSI_array[j].rssiVal>thirdEl.rssiVal) {
 					thirdEl = RSSI_array[j];
 				}
 			}
-		
+
 			calcDistance();
 			initRssiArray();
 					
@@ -138,7 +144,7 @@ implementation {
   	printf("Best nodeID= %d with RSSI= %d\n",firstEl.nodeId,firstEl.rssiVal);
   	printf("Second nodeID= %d with RSSI= %d\n",secondEl.nodeId,secondEl.rssiVal);
   	printf("Third nodeID= %d with RSSI= %d\n",thirdEl.nodeId,thirdEl.rssiVal);
-  	
+  	//esponenziale si fa cn pow(x,y))
   }
   
   
