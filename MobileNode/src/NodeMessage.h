@@ -13,6 +13,10 @@ typedef nx_struct NodeMessage {
 #define MOBILE 1
 #define ANCHOR 2
 
+enum {
+  MOVE_INTEVAL_MOBILE = 1000
+};
+
 enum{
 AM_RSSIMSG = 10
 };

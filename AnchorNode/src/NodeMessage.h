@@ -13,6 +13,10 @@ typedef nx_struct NodeMessage {
 #define MOBILE 1
 #define ANCHOR 2
 
+enum {
+   SEND_INTERVAL_ANCHOR = 250
+};
+
 enum{
 AM_RSSIMSG = 10
 };

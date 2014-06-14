@@ -1,4 +1,3 @@
-#include "ApplicationDefinitions.h"
 #include "NodeMessage.h"
 #include "Timer.h"
 #define NEW_PRINTF_SEMANTICS
@@ -33,36 +32,28 @@ implementation {
   message_t packet;
   
   void calcDistance();
-  void sendReq();
   void initRssiArray();
+  uint16_t getRSSI(message_t *msg);
+  
   
     //***************** Boot interface ********************//
   event void Boot.booted() {
-	printf("Application booted.\n");
+	printf("Mobile Mote booted.\n");
 	initRssiArray();
 	call RadioControl.start();
   }
   
-    //***************** SplitControl interface ********************//
-  event void RadioControl.startDone(error_t err){
-		call MilliTimer.startOneShot( 0 );
-  }
+    //***************** RadioControl interface ********************//
+  event void RadioControl.startDone(error_t err){}
   
   event void RadioControl.stopDone(error_t err){}
 
   //***************** MilliTimer interface ********************//
-  event void MilliTimer.fired() {
-	sendReq();
-  }
-
-  void sendReq() {	
-  	nodeMessage_t* mess = (nodeMessage_t*) (call Packet.getPayload(&packet,sizeof(nodeMessage_t)));
-  	
-  	printf("Request sended...");
-	mess->msg_type = REQ;
-	mess->mode_type = MOBILE;
-	call AMSend.send(AM_BROADCAST_ADDR, &packet , sizeof(nodeMessage_t));
-	call MilliTimer.startOneShot( SEND_INTERVAL_MOBILE );
+  event void MilliTimer.fired() {  }
+  
+   //***************** Retrieve RSSI Value ******************//
+  uint16_t getRSSI(message_t *msg){
+    return (uint16_t) call CC2420Packet.getRssi(msg);
   }
 
   //********************* AMSend interface ****************//
@@ -72,35 +63,20 @@ implementation {
   //***************************** Receive interface *****************//
   event message_t* Receive.receive(message_t* buf,void* payload, uint8_t len) {
 
-	am_addr_t sourceNodeId;	
+	am_addr_t sourceNodeId = call AMPacket.source(buf);	
 	nodeMessage_t* mess = (nodeMessage_t*) payload;
-	int i=0;
-	printf("Message received...\n");
+	printf("Message received from %d...\n", sourceNodeId);
+	mess->rssi = getRSSI(buf);
 	
-	
-	if ( mess->msg_type == RESP ) {
-		sourceNodeId = call AMPacket.source(buf);
+	if ( mess->msg_type == REQ && mess->mode_type == ANCHOR ) {
+		
 		RSSI_array[sourceNodeId-1].rssiVal = mess->rssi;
 		RSSI_array[sourceNodeId-1].nodeId = sourceNodeId;
-		
-		//stampo array utile per debug
-		for(i=0;i<8;i++) {
-			printf("%d_%d,",RSSI_array[i].nodeId, RSSI_array[i].rssiVal);
-		}
-		
-		printf("\nRSSI received: %d from %d\n",mess->rssi,sourceNodeId);
+		printf("RSSI received: %d from %d\n",mess->rssi,sourceNodeId);
 		
 		//se e' ultimo nodo vuol dire che ho finito di ricevere
 		//allora posso cercare i tre migliori e calcolare distanza
-		if(sourceNodeId == ANCHOR_NODE_NUMBER) {
-			int j;
-			//metto tutto a 0 (per ora, poi mettere a -999)
-			firstEl.nodeId=0;
-			firstEl.rssiVal=0;
-			secondEl.nodeId=0;
-			secondEl.rssiVal=0;
-			thirdEl.nodeId=0;
-			thirdEl.rssiVal=0;
+		/*if(sourceNodeId == ANCHOR_NODE_NUMBER) {
 			
 			for(j=0; j<ANCHOR_NODE_NUMBER; ++j) {
 				if(RSSI_array[j].rssiVal>firstEl.rssiVal) {
@@ -123,7 +99,7 @@ implementation {
 			calcDistance();
 			initRssiArray();
 					
-		}
+		}*/
 		
 	}
 
