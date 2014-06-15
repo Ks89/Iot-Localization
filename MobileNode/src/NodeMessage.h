@@ -14,7 +14,7 @@ typedef nx_struct NodeMessage {
 #define ANCHOR 2
 
 enum {
-  MOVE_INTEVAL_MOBILE = 1000
+  MOVE_INTERVAL_MOBILE = 1000
 };
 
 enum{

@@ -1,7 +1,7 @@
 #include "NodeMessage.h"
 #include "Timer.h"
 #define NEW_PRINTF_SEMANTICS
-#include "printf.h" 
+#include "printf.h"
 
 module MobileMoteC {
  
@@ -12,7 +12,6 @@ module MobileMoteC {
 		interface AMSend;
 		interface Packet;
 		interface Receive;
-		interface Timer<TMilli> as MilliTimer;
 		interface Timer<TMilli> as TimeOut;
 		interface CC2420Packet;
 	}
@@ -29,13 +28,16 @@ implementation {
 	struct rssiArrayElement RSSI_array[8] = {{-999,-999},{-999,-999},{-999,-999},
 		{-999,-999},{-999,-999},{-999,-999},{-999,-999},{-999,-999}};
 	struct rssiArrayElement firstEl={-999,-999}, secondEl={-999,-999}, thirdEl={-999,-999};
- 
+ 	struct rssiArrayElement RSSI_saved[8];
+ 	
 	message_t packet;
  
 	void calcDistance();
 	void initRssiArray();
 	uint16_t getRSSI(message_t *msg);
+	float distanceFromRSSI(int16_t RSSI, float v);
 	void printfFloat(float toBePrinted);
+	void initElem();
  
  
 	//***************** Boot interface ********************//
@@ -50,8 +52,6 @@ implementation {
  
 	event void RadioControl.stopDone(error_t err){}
 
-	//***************** MilliTimer interface ********************//
-	event void MilliTimer.fired() {  }
  
 	//***************** Retrieve RSSI Value ******************//
 	uint16_t getRSSI(message_t *msg){
@@ -64,8 +64,13 @@ implementation {
 
 
 	event void TimeOut.fired(){
-		calcDistance();
+		int j=0;
+		
+		for(j=0;j<8;j++) {
+			RSSI_saved[j] = RSSI_array[j];
+		}
 		initRssiArray();
+		calcDistance();
 	}
 
 
@@ -79,12 +84,12 @@ implementation {
 	
 		if ( mess->msg_type == REQ && mess->mode_type == ANCHOR ) {
 	
-			RSSI_array[sourceNodeId-1].rssiVal = mess->rssi;
+			RSSI_array[sourceNodeId-1].rssiVal = mess->rssi-45;
 			RSSI_array[sourceNodeId-1].nodeId = sourceNodeId;
 			printf("RSSI received: %d from %d\n",mess->rssi,sourceNodeId);
 	
 			if(!(call TimeOut.isRunning())) {
-				call TimeOut.startOneShot(MOVE_INTEVAL_MOBILE);
+				call TimeOut.startOneShot(MOVE_INTERVAL_MOBILE);
 			}
 		}
 		return buf;
@@ -100,33 +105,34 @@ implementation {
  
  
 	void calcDistance() {
-		float v,d ;
+			
+		float d,v;
 		int j=0;
 		for(j=0;j<8;j++) {
-			printf("i=%d, Node=%d, RSSI=%d\n", j, RSSI_array[j].nodeId, RSSI_array[j].rssiVal);
+			printf("i=%d, Node=%d, RSSI=%d\n", j, RSSI_saved[j].nodeId, RSSI_saved[j].rssiVal);
 		}
 	
 		for(j=0; j<8; ++j) {
-			if(RSSI_array[j].rssiVal>firstEl.rssiVal) {
-				firstEl = RSSI_array[j];
+			if(RSSI_saved[j].rssiVal>firstEl.rssiVal) {
+				firstEl = RSSI_saved[j];
 			}
 		}
-		RSSI_array[firstEl.nodeId-1].rssiVal = -999;
+		RSSI_saved[firstEl.nodeId-1].rssiVal = -999;
 		for(j=0; j<8; ++j) {
-			if(RSSI_array[j].rssiVal>secondEl.rssiVal ) {
-				secondEl = RSSI_array[j];
+			if(RSSI_saved[j].rssiVal>secondEl.rssiVal ) {
+				secondEl = RSSI_saved[j];
 			}
 		}
-		RSSI_array[secondEl.nodeId-1].rssiVal = -999;
+		RSSI_saved[secondEl.nodeId-1].rssiVal = -999;
 		for(j=0; j<8 ; ++j) {
-			if(RSSI_array[j].rssiVal>thirdEl.rssiVal) {
-				thirdEl = RSSI_array[j];
+			if(RSSI_saved[j].rssiVal>thirdEl.rssiVal) {
+				thirdEl = RSSI_saved[j];
 			}
 		}
 	
-		printf("Best nodeID= %d with RSSI= %d\n",firstEl.nodeId,firstEl.rssiVal);
-		printf("Second nodeID= %d with RSSI= %d\n",secondEl.nodeId,secondEl.rssiVal);
-		printf("Third nodeID= %d with RSSI= %d\n",thirdEl.nodeId,thirdEl.rssiVal);
+		printf(">>> Best nodeID = %d with RSSI= %d\n",firstEl.nodeId,firstEl.rssiVal);
+		printf(">>> Second nodeID = %d with RSSI= %d\n",secondEl.nodeId,secondEl.rssiVal);
+		printf(">>> Third nodeID = %d with RSSI= %d\n",thirdEl.nodeId,thirdEl.rssiVal);
 
 		//valori temporanei buttati un po' a caso per ora
 		//secondo il web bisogna sottrarre 45 all'rssi....boh
@@ -135,25 +141,43 @@ implementation {
 		//Su internet dicono di usare senza math e compilare con make telosb -lm
 		//in effetti compila (non ricordo se con pow o powf)
 		//Cm non sono nemmeno fiducioso che funzioni davvero
-		v = -2; //fare gauss
-		printf("firstEl = ");
-		d = -((firstEl.rssiVal-45+60-v)/10);   
+		v = 0; //fare gauss
+		printf(">>> firstEl = ");
+		d = distanceFromRSSI(firstEl.rssiVal,v);
 		printfFloat(d);
-		printf("\nsecondEl = ");
-		d = -((secondEl.rssiVal-45+60-v)/10);   
+		printf("\n>>> secondEl = ");
+		d = distanceFromRSSI(secondEl.rssiVal,v);   
 		printfFloat(d);
-		printf("\nthirdEl = ");
-		d = -((thirdEl.rssiVal-45+60-v)/10);   
+		printf("\n>>> thirdEl = ");
+		d = distanceFromRSSI(thirdEl.rssiVal,v);   
 		printfFloat(d);
 		printf("\n");
+		
+		initElem();
 	}
+ 	
+ 	float distanceFromRSSI(int16_t RSSI, float v) {
+ 		float res, p;
+ 		p = (-60+v-RSSI)/10;
+ 		res = powf(10, p);
+ 		return res;
+ 	}
  
- 
- 
+ 	
+ 	void initElem(){
+ 		firstEl.nodeId=-999;
+ 		firstEl.rssiVal=-999;
+ 		
+ 		secondEl.nodeId=-999;
+ 		secondEl.rssiVal=-999;
+ 		
+ 		thirdEl.nodeId=-999;
+ 		thirdEl.rssiVal=-999;
+ 	}
 	//utility
 	//https://www.millennium.berkeley.edu/pipermail/tinyos-help/2008-June/034691.html
 	void printfFloat(float toBePrinted) {
-		uint32_t fi, f0, f1, f2;
+		uint32_t fi, f0, f1, f2, f3, f4, f5;
 		char c;
 		float f = toBePrinted;
 
@@ -168,10 +192,13 @@ implementation {
 
 		// decimal portion...get index for up to 3 decimal places.
 		f = f - ((float) fi);
-		f0 = f*10;   f0 %= 10;
-		f1 = f*100;  f1 %= 10;
-		f2 = f*1000; f2 %= 10;
-		printf("%c%ld.%d%d%d", c, fi, (uint8_t) f0, (uint8_t) f1, (uint8_t) f2);
+		f0 = f*10;   	f0 %= 10;
+		f1 = f*100;  	f1 %= 10;
+		f2 = f*1000; 	f2 %= 10;
+		f3 = f*10000; 	f3 %= 10;
+		f4 = f*100000; 	f4 %= 10;
+		f5 = f*1000000; f5 %= 10;
+		printf("%c%ld.%d%d%d%d%d%d", c, fi, (uint8_t) f0, (uint8_t) f1, (uint8_t) f2, (uint8_t) f3, (uint8_t) f4, (uint8_t) f5);
 	}
  
 
