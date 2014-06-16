@@ -25,19 +25,29 @@ implementation {
 		int16_t rssiVal;
 	};
  
+	//vettore degli rssi ricevuti, con associato il nodo
 	struct rssiArrayElement RSSI_array[8] = {{-999,-999},{-999,-999},{-999,-999},
 		{-999,-999},{-999,-999},{-999,-999},{-999,-999},{-999,-999}};
-	struct rssiArrayElement firstEl={-999,-999}, secondEl={-999,-999}, thirdEl={-999,-999};
- 	struct rssiArrayElement RSSI_saved[8];
- 	
+	
+	//vettore con i 3 nodi in ordine crescente di potenza
+	struct rssiArrayElement topThreeNode[8] = {{-999,-999},{-999,-999},{-999,-999}};
+	struct rssiArrayElement RSSI_saved[8];
+	
+	//vettore con le distanze calcolate per i 3 nodi. Qui le distance
+	//sono in ordine decrescente. Cioe' nodo con piu' potenza e' piu' vicino
+	//e quindi con distanza minore
+	float distanceArray[3] = {-999,-999,-999};
+	
 	message_t packet;
  
 	void calcDistance();
+	void createTopThreeNode();
 	void initRssiArray();
+	void initTopThreeNode();
+	void initDistanceArray();
 	uint16_t getRSSI(message_t *msg);
 	float distanceFromRSSI(int16_t RSSI, float v);
 	void printfFloat(float toBePrinted);
-	void initElem();
  
  
 	//***************** Boot interface ********************//
@@ -65,12 +75,16 @@ implementation {
 
 	event void TimeOut.fired(){
 		int j=0;
-		
+	
 		for(j=0;j<8;j++) {
 			RSSI_saved[j] = RSSI_array[j];
 		}
-		initRssiArray();
+	
+		createTopThreeNode();
 		calcDistance();
+		initRssiArray();
+		initTopThreeNode();
+		initDistanceArray();
 	}
 
 
@@ -83,7 +97,8 @@ implementation {
 		mess->rssi = getRSSI(buf);
 	
 		if ( mess->msg_type == REQ && mess->mode_type == ANCHOR ) {
-	
+			
+			//sottraggo 45 perche' per il telosb bisogna fare cosi'
 			RSSI_array[sourceNodeId-1].rssiVal = mess->rssi-45;
 			RSSI_array[sourceNodeId-1].nodeId = sourceNodeId;
 			printf("RSSI received: %d from %d\n",mess->rssi,sourceNodeId);
@@ -96,84 +111,94 @@ implementation {
 	}
  
 	void initRssiArray() {
-		int i=0;
+		int i;
 		for(i=0;i<8;i++) {
 			RSSI_array[i].rssiVal = -999;
-			RSSI_array[i].nodeId = -999;
 		}
 	}
  
+	void initTopThreeNode() {
+		int i;
+		for(i=0;i<3;i++) {
+			topThreeNode[i].rssiVal = -999;
+		}
+	}
  
-	void calcDistance() {
-			
-		float d,v;
-		int j=0;
+	void initDistanceArray() {
+		int i;
+		for(i=0;i<3;i++) {
+			distanceArray[i] = -999;
+		}
+	}
+ 
+	//metodo che crea la top 3 dei nodi con potenza piu' alta ordinati 
+	//in [0],[1] e [2] in modo crescente  
+	void createTopThreeNode(){
+		int j;
 		for(j=0;j<8;j++) {
-			printf("i=%d, Node=%d, RSSI=%d\n", j, RSSI_saved[j].nodeId, RSSI_saved[j].rssiVal);
+			printf("Node=%d, RSSI=%d\n", RSSI_array[j].nodeId, RSSI_array[j].rssiVal);
 		}
 	
 		for(j=0; j<8; ++j) {
-			if(RSSI_saved[j].rssiVal>firstEl.rssiVal) {
-				firstEl = RSSI_saved[j];
+			if(RSSI_array[j].rssiVal>topThreeNode[0].rssiVal) {
+				topThreeNode[0] = RSSI_array[j];
 			}
 		}
-		RSSI_saved[firstEl.nodeId-1].rssiVal = -999;
+		RSSI_array[topThreeNode[0].nodeId-1].rssiVal = -999;
 		for(j=0; j<8; ++j) {
-			if(RSSI_saved[j].rssiVal>secondEl.rssiVal ) {
-				secondEl = RSSI_saved[j];
+			if(RSSI_array[j].rssiVal>topThreeNode[1].rssiVal ) {
+				topThreeNode[1] = RSSI_array[j];
 			}
 		}
-		RSSI_saved[secondEl.nodeId-1].rssiVal = -999;
+		RSSI_array[topThreeNode[1].nodeId-1].rssiVal = -999;
 		for(j=0; j<8 ; ++j) {
-			if(RSSI_saved[j].rssiVal>thirdEl.rssiVal) {
-				thirdEl = RSSI_saved[j];
+			if(RSSI_array[j].rssiVal>topThreeNode[2].rssiVal) {
+				topThreeNode[2] = RSSI_array[j];
 			}
 		}
 	
-		printf(">>> Best nodeID = %d with RSSI= %d\n",firstEl.nodeId,firstEl.rssiVal);
-		printf(">>> Second nodeID = %d with RSSI= %d\n",secondEl.nodeId,secondEl.rssiVal);
-		printf(">>> Third nodeID = %d with RSSI= %d\n",thirdEl.nodeId,thirdEl.rssiVal);
-
-		//valori temporanei buttati un po' a caso per ora
-		//secondo il web bisogna sottrarre 45 all'rssi....boh
-		//NOTA BENE:  d = pow(10,-((firstEl.rssiVal-45+60-v)/10));  
-		//non va perche' pow non e' trovata e con math.h non compila
-		//Su internet dicono di usare senza math e compilare con make telosb -lm
-		//in effetti compila (non ricordo se con pow o powf)
-		//Cm non sono nemmeno fiducioso che funzioni davvero
-		v = 0; //fare gauss
-		printf(">>> firstEl = ");
-		d = distanceFromRSSI(firstEl.rssiVal,v);
-		printfFloat(d);
-		printf("\n>>> secondEl = ");
-		d = distanceFromRSSI(secondEl.rssiVal,v);   
-		printfFloat(d);
-		printf("\n>>> thirdEl = ");
-		d = distanceFromRSSI(thirdEl.rssiVal,v);   
-		printfFloat(d);
-		printf("\n");
-		
-		initElem();
+		printf("Best nodeID= %d with RSSI= %d\n",topThreeNode[0].nodeId,topThreeNode[0].rssiVal);
+		printf("Second nodeID= %d with RSSI= %d\n",topThreeNode[1].nodeId,topThreeNode[1].rssiVal);
+		printf("Third nodeID= %d with RSSI= %d\n",topThreeNode[2].nodeId,topThreeNode[2].rssiVal);
 	}
- 	
- 	float distanceFromRSSI(int16_t RSSI, float v) {
- 		float res, p;
- 		p = (-60+v-RSSI)/10;
- 		res = powf(10, p);
- 		return res;
- 	}
  
- 	
- 	void initElem(){
- 		firstEl.nodeId=-999;
- 		firstEl.rssiVal=-999;
- 		
- 		secondEl.nodeId=-999;
- 		secondEl.rssiVal=-999;
- 		
- 		thirdEl.nodeId=-999;
- 		thirdEl.rssiVal=-999;
- 	}
+	//funzione che partendo dalla top 3 dei nodi con piu' potenza ne calcola la distanza
+	//strimata dal nodo mobile
+	void calcDistance() {
+		float v;
+		int i;
+
+		//per i tre nodi (se sono nel range di ricezione del mobile)
+		//cioe' non ci sono -999 come nodo e come rssi cacolo distanza
+		//e metto nel vettore delle distanze
+		for(i=0;i<3;i++) {
+			if(topThreeNode[i].nodeId!=-999 && topThreeNode[i].rssiVal!=-999) {
+				v = 0; //fare gauss
+				distanceArray[i] = distanceFromRSSI(topThreeNode[i].rssiVal,v);   
+			}
+		}
+	
+		//stampo array distanze per vedere i risultati
+		for(i=0;i<3;i++) {
+			if(distanceArray[i]!=-999) {
+				printf("\n>>>Position in chart %d, distance = ", i+1);
+				printfFloat(distanceArray[i]);
+			}
+		}
+		printf("\n");	
+	}
+	
+	//funzione per calcolare distanza da rssi
+	//l'rssi in ingresso deve essere gia' il valore reale.
+	//nel caso del telosb bisogna averlo sottratto di 45, prima
+	//di chiamare questa funzione
+	float distanceFromRSSI(int16_t RSSI, float v) {
+		float res, p;
+		p = (-60+v-RSSI)/10;
+		res = powf(10, p);
+		return res;
+	}
+ 
 	//utility
 	//https://www.millennium.berkeley.edu/pipermail/tinyos-help/2008-June/034691.html
 	void printfFloat(float toBePrinted) {
@@ -200,7 +225,4 @@ implementation {
 		f5 = f*1000000; f5 %= 10;
 		printf("%c%ld.%d%d%d%d%d%d", c, fi, (uint8_t) f0, (uint8_t) f1, (uint8_t) f2, (uint8_t) f3, (uint8_t) f4, (uint8_t) f5);
 	}
- 
-
-
 }
