@@ -24,6 +24,11 @@ implementation {
 		int nodeId;
 		int16_t rssiVal;
 	};
+ 	
+ 	struct coordinateElement {
+		float x;
+		float y;
+	};
  
 	//vettore degli rssi ricevuti, con associato il nodo
 	struct rssiArrayElement RSSI_array[8] = {{-999,-999},{-999,-999},{-999,-999},
@@ -38,6 +43,13 @@ implementation {
 	//e quindi con distanza minore
 	float distanceArray[3] = {-999,-999,-999};
 	
+	//vettore con le coordinate di ogni anchorNode
+	struct coordinateElement anchorCoord[8] = {{-999,-999},{-999,-999},{-999,-999},
+		{-999,-999},{-999,-999},{-999,-999},{-999,-999},{-999,-999}};
+	
+	//posizione stimata del nodo mobile
+	float posX, posY;
+	
 	message_t packet;
  
 	void calcDistance();
@@ -47,6 +59,7 @@ implementation {
 	void initDistanceArray();
 	uint16_t getRSSI(message_t *msg);
 	float distanceFromRSSI(int16_t RSSI, float v);
+	void getMobileNodePosition();
 	void printfFloat(float toBePrinted);
  
  
@@ -197,6 +210,49 @@ implementation {
 		p = (-60+v-RSSI)/10;
 		res = powf(10, p);
 		return res;
+	}
+ 
+ 	//funzione per calcolare la posizione stimata del nodo mobile.
+	//presuppone di avere gia' tutti i dati e soprattutto le posizioni dei nodi anchor
+	//nel vettore anchorCoord
+	void getMobileNodePosition() {
+		int i,j;
+		float x=0,y=0, sqrtValue, partOne, sumX=0, sumY=0, sumFunct=0;
+		float alpha = 0.1; //messo a caso
+		float functToMin, functToMinPrev=9999;
+	
+	
+		while(functToMin<functToMinPrev) {
+			sumFunct = 0;
+			sumX = 0;
+			sumY = 0;
+			
+			//calcolo x e y
+			for(i=0;i<3;i++) {
+				sqrtValue = sqrtf(powf(x-anchorCoord[topThreeNode[i].nodeId].x,2) 
+						+ powf(y-anchorCoord[topThreeNode[i].nodeId].y,2));
+				partOne = 1 - (distanceArray[topThreeNode[i].nodeId]/sqrtValue);
+				sumX = sumX + (partOne * (x - anchorCoord[topThreeNode[i].nodeId].x));
+				sumY = sumY + (partOne * (y - anchorCoord[topThreeNode[i].nodeId].y));
+				
+				sumFunct = sumFunct + powf((sqrtValue - distanceArray[topThreeNode[i].nodeId]),2);
+	
+			}
+			
+			//calcolo x e y stimate 
+			x = x - (alpha * sumX);
+			y = y - (alpha * sumY);
+	
+			//aggiiorno funzione precedente con l'attuale
+			functToMinPrev = functToMin;
+			
+			//calcolo la funzione da minimizzare
+			functToMin = (0.5) * sumFunct;
+		}
+		
+		//uscito dal while ho i 2 volari di x e y stimati finali
+		//perche' la funzione e' minimizzata, visto che al passo successivo
+		//aumenta, quindi la funzione minimizzata finale e' dentro a functToMinPrev
 	}
  
 	//utility
