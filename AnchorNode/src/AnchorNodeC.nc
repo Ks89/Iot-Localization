@@ -44,7 +44,7 @@ implementation {
 	mess->msg_type = REQ;
 	mess->mode_type = ANCHOR;
 	mess->x = anchorCoord[TOS_NODE_ID].x;
-	mess->y = mobileCoord[TOS_NODE_ID].y;
+	mess->y = anchorCoord[TOS_NODE_ID].y;
 	 
 	printf("Try to broadcast the message... \n");
 	call AMSend.send(AM_BROADCAST_ADDR,&packet,sizeof(nodeMessage_t));

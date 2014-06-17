@@ -4,8 +4,8 @@
 typedef nx_struct NodeMessage {
 	nx_uint8_t mode_type;
 	nx_uint8_t msg_type;
-	float x;
-	float y;
+	nx_float x;
+	nx_float y;
 } nodeMessage_t;
 
 typedef struct coordinate {

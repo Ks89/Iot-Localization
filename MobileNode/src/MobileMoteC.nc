@@ -2,6 +2,7 @@
 #include "Timer.h"
 #define NEW_PRINTF_SEMANTICS
 #include "printf.h"
+#include "math.h"
 
 module MobileMoteC {
  
@@ -163,7 +164,7 @@ implementation {
 		int16_t rssi;
 		float distance;
 		distance = sqrtf(powf(x-mobileCoord[time].x,2)+powf(y-mobileCoord[time].y,2));
-		rssi = -60 + 10 * logf10(distance)+getGaussian();
+		rssi = -60 + 10 * log10f(distance)+getGaussian();
 		return rssi;
 	}
 	
@@ -174,7 +175,6 @@ implementation {
 	//funzione che partendo dalla top 3 dei nodi con piu' potenza ne calcola la distanza
 	//stimata dal nodo mobile
 	void calcDist() {
-		float v;
 		int i;
 
 		//per i tre nodi (se sono nel range di ricezione del mobile)
