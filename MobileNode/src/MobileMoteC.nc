@@ -48,6 +48,7 @@ implementation {
 	void calcDist();
 	void findTopNode();
 	void initNodeArray(nodeValue *array);
+	void initTopArray(nodeValue *array);
 	void initDistArray();
 	float distFromRSSI(int16_t RSSI);
 	void getPosition();
@@ -87,7 +88,7 @@ implementation {
 		getPosition();
 		initNodeArray(RSSIArray);
 		initNodeArray(RSSISaved);
-		initNodeArray(topNode);
+		initTopArray(topNode);
 		initDistArray();
 		time++;
 	}
@@ -115,7 +116,15 @@ implementation {
  
 	void initNodeArray(nodeValue *array) {
 		int i;
-		for(i=0;i<sizeof(array)/sizeof(array[0]);i++) {
+		for(i=0;i<8;i++) {
+			array[i].nodeId = -999;
+			array[i].rssiVal = -999;
+		}
+	}
+	
+	void initTopArray(nodeValue *array) {
+		int i;
+		for(i=0;i<3;i++) {
 			array[i].nodeId = -999;
 			array[i].rssiVal = -999;
 		}
