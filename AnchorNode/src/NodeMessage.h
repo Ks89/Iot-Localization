@@ -4,8 +4,25 @@
 typedef nx_struct NodeMessage {
 	nx_uint8_t mode_type;
 	nx_uint8_t msg_type;
-	nx_int16_t rssi;
+	float x;
+	float y;
 } nodeMessage_t;
+
+typedef struct coordinate {
+  	float x;
+  	float y;
+} coord;
+
+coord anchorCoord[8] = {
+	{1, 0},
+	{1, 1},
+	{1, 2},
+	{1, 3},
+	{-1, 0},
+	{-1, 1},
+	{-1, 2},
+	{-1, 3}
+};  
 
 #define REQ 1
 #define RESP 2
@@ -13,12 +30,8 @@ typedef nx_struct NodeMessage {
 #define MOBILE 1
 #define ANCHOR 2
 
-enum {
-   SEND_INTERVAL_ANCHOR = 250
-};
+#define SEND_INTERVAL_ANCHOR 250
+#define AM_RSSIMSG 10
 
-enum{
-AM_RSSIMSG = 10
-};
 
 #endif

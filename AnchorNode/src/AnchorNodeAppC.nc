@@ -10,7 +10,7 @@ implementation {
 	components AnchorNodeC as App;
 	components new AMSenderC(AM_RSSIMSG);
 	components new AMReceiverC(AM_RSSIMSG);
-	components new TimerMilliC();
+	components new TimerMilliC() as TimeOut;
 	components ActiveMessageC;
 	
 	  //Send and Receive interfaces
@@ -22,6 +22,6 @@ implementation {
 	  //Interfaces to access package fields
 	  App.AMPacket -> AMSenderC;
 	  //Timer interface
-	  App.MilliTimer -> TimerMilliC;
+	  App.TimeOut -> TimeOut;
 
 }

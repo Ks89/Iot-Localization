@@ -11,7 +11,7 @@ implementation {
   components new AMSenderC(AM_RSSIMSG);
   components new AMReceiverC(AM_RSSIMSG);
   components new TimerMilliC() as TimeOut;
-  components CC2420ActiveMessageC, ActiveMessageC;
+  components ActiveMessageC;
   components MobileMoteC as App;
   
   
@@ -27,6 +27,5 @@ implementation {
   //Interfaces to access package fields
   App.AMPacket -> AMSenderC;
   App.Packet -> AMSenderC;
-  App.CC2420Packet -> CC2420ActiveMessageC.CC2420Packet;
-  
+ 
 }

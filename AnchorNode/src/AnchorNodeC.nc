@@ -10,18 +10,12 @@ module AnchorNodeC {
 	    interface AMPacket;
 	    interface AMSend;
 	    interface Packet;
-	    interface Timer<TMilli> as MilliTimer;
+	    interface Timer<TMilli> as TimeOut;
 	}
 }
 
 implementation {
-  
-  uint16_t RSSI;
-  uint16_t source;
-  
   message_t packet;
-  nodeMessage_t* message; 
- 
     
   void sendPacket();
   
@@ -31,15 +25,15 @@ implementation {
 	call RadioControl.start();
   }
   
-    //***************** SplitControl interface ********************//
+    //***************** RadioControl interface ********************//
   event void RadioControl.startDone(error_t err){
-  	call MilliTimer.startOneShot(SEND_INTERVAL_ANCHOR);
+  	call TimeOut.startOneShot(SEND_INTERVAL_ANCHOR);
   }
   
   event void RadioControl.stopDone(error_t err){}
   
   //***************** MilliTimer interface ********************//
-  event void MilliTimer.fired() {
+  event void TimeOut.fired() {
 	sendPacket();
   }
   
@@ -49,10 +43,13 @@ implementation {
 	nodeMessage_t* mess = (nodeMessage_t*) (call Packet.getPayload(&packet,sizeof(nodeMessage_t)));
 	mess->msg_type = REQ;
 	mess->mode_type = ANCHOR;
+	mess->x = anchorCoord[TOS_NODE_ID].x;
+	mess->y = mobileCoord[TOS_NODE_ID].y;
 	 
 	printf("Try to broadcast the message... \n");
 	call AMSend.send(AM_BROADCAST_ADDR,&packet,sizeof(nodeMessage_t));
-	call MilliTimer.startOneShot(SEND_INTERVAL_ANCHOR);
+	
+	call TimeOut.startOneShot(SEND_INTERVAL_ANCHOR);
 	printf("Starting new timer...");
 
   }
