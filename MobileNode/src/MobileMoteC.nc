@@ -215,75 +215,107 @@ implementation {
  	//funzione per calcolare la posizione stimata del nodo mobile.
 	//presuppone di avere gia' tutti i dati e soprattutto le posizioni dei nodi anchor
 	//nel vettore anchorCoord
+	//PER ORA METTO DENTRO IO DEI VALORI A MUZZO SOLO PER PROVARE LA FUNZIONE
 	void getPosition() {
-		int i;
-		float x = mobileCoord[time].x, y = mobileCoord[time].y;
+		int i,j=0;
 		float sqrtValue, partOne, sumX=0, sumY=0, sumFunct=0;
 		float alpha = 0.5; //parte da un valore elevato apposta
 		float functToMin=9998, functToMinPrev=9999;
 	
-		while(functToMin<functToMinPrev) {
-			printf("CICLO WHILE\nfunctToMin= ");
-			
-			
+		//medio le posizioni dei tre nodi in topNode perche' piu' vicini 
+		posX=(anchorCoord[topNode[0].nodeId].x+anchorCoord[topNode[1].nodeId].x+anchorCoord[topNode[2].nodeId].x)/3;
+		posY=(anchorCoord[topNode[0].nodeId].y+anchorCoord[topNode[1].nodeId].y+anchorCoord[topNode[2].nodeId].y)/3;
+	
+		//functToMinPrev e' la funzione costo al passo precedente.
+		//functToMin e' quella al passo attuale 
+		while(functToMin < functToMinPrev ) {
+			printf("CICLO WHILE\n");
+			j++;
 			sumFunct = 0;
 			sumX = 0;
 			sumY = 0;
-			
+	
+			//per ridurre il numero di iterzioni uso un'alpha adattativo
+			//che diminuisce col passare del tempo (cioe' all'aumentare delle iterazioni).
+			//Questo per far si che l'algoritmo diventi piu' preciso man mano che si avvicina
+			//alla soluzione. 
+			if(j>4) {
+				alpha = 0.3;
+			} else {
+				if(j>6) {
+					alpha = 0.2;
+				} else {
+					alpha = 0.1;
+				}	
+			}
+	
+			//			printf("topthreenode: %d %d %d",topThreeNode[0].nodeId-1,topThreeNode[1].nodeId-1,topThreeNode[2].nodeId-1);
+			//			printf("\nanchorCoordX:");
+			//			printfFloat(anchorCoord[topThreeNode[0].nodeId-1].x);
+			//			printf("\n");
+			//			printfFloat(anchorCoord[topThreeNode[1].nodeId-1].x);
+			//			printf("\n");
+			//			printfFloat(anchorCoord[topThreeNode[2].nodeId-1].x);
+			//			printf("\n");
+			//			
+			//			printf("\nanchorCoordY:");
+			//			printfFloat(anchorCoord[topThreeNode[0].nodeId-1].y);
+			//			printf("\n");
+			//			printfFloat(anchorCoord[topThreeNode[1].nodeId-1].y);
+			//			printf("\n");
+			//			printfFloat(anchorCoord[topThreeNode[2].nodeId-1].y);
+			//			printf("\n");
+	
 			//calcolo x e y
 			for(i=0;i<3;i++) {
-				sqrtValue = sqrtf(powf(x-anchorCoord[topNode[i].nodeId-1].x,2) 
-						+ powf(y-anchorCoord[topNode[i].nodeId-1].y,2));
-				partOne = 1 - (distArray[topNode[i].nodeId-1]/sqrtValue);
-				sumX = sumX + (partOne * (x - anchorCoord[topNode[i].nodeId-1].x));
-				sumY = sumY + (partOne * (y - anchorCoord[topNode[i].nodeId-1].y));
-				
-				sumFunct = sumFunct + powf((sqrtValue - distArray[topNode[i].nodeId-1]),2);
+				sqrtValue = sqrtf(powf(posX-anchorCoord[topNode[i].nodeId-1].x,2) 
+						+ powf(posY-anchorCoord[topNode[i].nodeId-1].y,2));
+				partOne = 1 - (distArray[i]/sqrtValue);
+				sumX = sumX + (partOne * (posX - anchorCoord[topNode[i].nodeId-1].x));
+				sumY = sumY + (partOne * (posY - anchorCoord[topNode[i].nodeId-1].y));
 	
-				printf("\nCICLO FOR %d, sqrtValue ", i);
-				printfFloat(sqrtValue);
-				printf("\npartOne ");
-				printfFloat(partOne);
-				printf("\nsumX ");
-				printfFloat(sumX);
-				printf("\nsumY ");
-				printfFloat(sumY);
-				printf("\nsumFunct ");
-				printfFloat(sumFunct);
-				printf("\n");
+				sumFunct = sumFunct + powf((sqrtValue - distArray[i]),2);
+	
+				//				printf("\nCICLO FOR %d, sqrtValue ", i);
+				//				printfFloat(sqrtValue);
+				//				printf("\npartOne ");
+				//				printfFloat(partOne);
+				//				printf("\nsumX ");
+				//				printfFloat(sumX);
+				//				printf("\nsumY ");
+				//				printfFloat(sumY);
+				//				printf("\nsumFunct ");
+				//				printfFloat(sumFunct);
+				//				printf("\n");
 			}
-			
+	
 			//calcolo x e y stimate 
-			x = x - (alpha * sumX);
-			y = y - (alpha * sumY);
+			posX = posX - (alpha * sumX);
+			posY = posY - (alpha * sumY);
 	
 			printf("\nX ");
-			printfFloat(x);
+			printfFloat(posX);
 			printf("\nY ");
-			printfFloat(y);
+			printfFloat(posY);
 			printf("\n");
-			
+	
 			//aggiorno funzione precedente con l'attuale
 			functToMinPrev = functToMin;
-			
+	
 			//calcolo la funzione da minimizzare
 			functToMin = (0.5) * sumFunct;
-			
+	
 			printf("\nfunctToMin= ");
 			printfFloat(functToMin);
 			printf("\nfunctToMinPrev= ");
 			printfFloat(functToMinPrev);
 			printf("\n");
 		}
-		
+	
 		//uscito dal while ho i 2 volari di x e y stimati finali
 		//perche' la funzione e' minimizzata, visto che al passo successivo
 		//aumenta, quindi la funzione minimizzata finale e' dentro a functToMinPrev
-		printf("\nfunctToMin= ");
-			printfFloat(functToMin);
-			printf("\nfunctToMinPrev= ");
-			printfFloat(functToMinPrev);
-			printf("\n");
+		printf("\niteraz while= %d\n",j);
 	}
  
 	//utility
