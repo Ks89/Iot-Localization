@@ -14,7 +14,7 @@ module MobileMoteC {
 		interface Packet;
 		interface Receive;
 		interface Timer<TMilli> as TimeOut250;
-		interface Timer<TMilli> as TimeOut150;
+		interface Timer<TMilli> as TimeOut180;
 		interface Random;
 	}
 }
@@ -43,15 +43,15 @@ implementation {
 	float posX, posY;
 	float X = 0,Y = 0;
 	
-	
 	//----->GRAFICO FINALE = errore nel determinare la posizione (cioe' distanze tra posizione stimata e reale)
 	float errorDist[24];
 	
 	//----->GRAFICO FINALE = i valori crescenti di varianza che sono fissi
 	float variance[6];
 	
-	
 	//movimento del nodo mobile, ogni istante di tempo (time)
+	//cycle rappresenta la misurazione eseguita nello stesso intervallo di tempo
+	//che poi verra' mediata con le altre nello stesso time
 	int time = 0;
 	int cycle = 0;
 	
@@ -86,26 +86,26 @@ implementation {
 		call RadioControl.start();
 	}
  
-	//***************** RadioControl interface ********************//
+	//***************** RadioControl interfaces ********************//
 	event void RadioControl.startDone(error_t err){}
- 
 	event void RadioControl.stopDone(error_t err){}
 
 	//********************* AMSend interface ****************//
-	event void AMSend.sendDone(message_t* buf,error_t err) {
-	}
+	event void AMSend.sendDone(message_t* buf,error_t err) {}
 
 	event void TimeOut250.fired(){
 		call TimeOut250.startOneShot(SEND_INTERVAL_ANCHOR);
 	}
 	
-	event void TimeOut150.fired() {
-		
+	
+	//Timer di 180 ms in cui il nodo mobile riceve i pacchetti dalle ancore
+	event void TimeOut180.fired() {
 		int j=0;
 	
 		for(j=0;j<8;j++) {
 			RSSISaved[j] = RSSIArray[j];
 		}
+		
 		//initNodeArray(RSSIArray);
 	
 		printf("[Mobile]-------------------->MobileNode : position (");
@@ -117,6 +117,8 @@ implementation {
 		findTopNode();
 		calcDist();
 		getPosition();
+		
+		//calcolo errore sui valori ottenuti
 		X += posX; Y += posY;
 		if(cycle %  4 == 3 && cycle != 0) {
 			posX = X / 4.0;
@@ -124,7 +126,7 @@ implementation {
 			getError();
 		}
 		
-		//e poi inizializzo per il movimento successivo, cioe' nell'istante di tempo time++
+		//inizializzo per il movimento successivo, cioe' nell'istante di tempo time++
 		initNodeArray(RSSISaved);
 		initTopArray(topNode);
 		initDistArray();
@@ -132,6 +134,7 @@ implementation {
 		cycle++;
 		if(cycle %  4 == 0) {
 			X = 0; Y = 0;
+			//dopo aver preso le 4 misurazioni muovo il nodo mobile
 			time++;	
 			
 		}
@@ -145,15 +148,15 @@ implementation {
 		printf("[Mobile]Message received from %d... type %d\n", sourceNodeId, mess->msg_type);
 	
 		if ( mess->msg_type == REQ && mess->mode_type == ANCHOR ) {
-	
 			RSSIArray[sourceNodeId-1].rssiVal = calcRSSI(mess->x,mess->y);
 			RSSIArray[sourceNodeId-1].nodeId = sourceNodeId;
 			printf("[Mobile]RSSI calculated: %d from %d\n",RSSIArray[sourceNodeId-1].rssiVal,sourceNodeId);
 			
-			if(!(call TimeOut150.isRunning())) {
-				call TimeOut150.startOneShot(RECEIVE_INTERVAL_ANCHOR);
+			//se gia non sto ricevendo, attivo il timer180
+			if(!(call TimeOut180.isRunning())) {
+				call TimeOut180.startOneShot(RECEIVE_INTERVAL_ANCHOR);
 			}		
-		}
+		} //nel caso il messaggio ricevuto e' di sync avvio timer delle misurazione eseguite nel cycle
 		else if(mess->msg_type == SYNCPACKET) {
 			call TimeOut250.startOneShot(SEND_INTERVAL_ANCHOR);
 		}
@@ -230,7 +233,7 @@ implementation {
 		return rssi;
 	}
 	
-	//
+	//	ottengo valore gaussiano v con varianza specificata dal vettore variance[cycle]
 	float getGaussian() {
 		float var = variance[cycle]; 
 		//0 e' la media che deve restare nulla perche' detto dalle specifiche
@@ -247,8 +250,8 @@ implementation {
 		int i;
 
 		//per i tre nodi (se sono nel range di ricezione del mobile)
-		//cioe' non ci sono -999 come nodo e come rssi cacolo distanza
-		//e metto nel vettore delle distanze
+		//cioe' non ci sono -999 come nodo e come rssi calcolo la distanza
+		//e la metto nel vettore delle distanze
 		for(i=0;i<3;i++) {
 			if(topNode[i].nodeId!=-999 && topNode[i].rssiVal!=-999) {
 				distArray[i] = distFromRSSI(topNode[i].rssiVal);   
@@ -269,8 +272,7 @@ implementation {
 		float res, p;
 		float rssi = RSSI;
 	
-		//senza la conversione in float la formula viene approssimata
-		//male e per quale motivo oscuro da sempre 10 come risultato
+		//senza la conversione in float la formula viene approssimata male
 		p = (-60-rssi)/10;
 		res = powf(10, p);
 		return res;
@@ -279,7 +281,6 @@ implementation {
 	//funzione per calcolare la posizione stimata del nodo mobile.
 	//presuppone di avere gia' tutti i dati e soprattutto le posizioni dei nodi anchor
 	//nel vettore anchorCoord
-	//PER ORA METTO DENTRO IO DEI VALORI A MUZZO SOLO PER PROVARE LA FUNZIONE
 	void getPosition() {
 		int i,j=0;
 		float sqrtValue, partOne, sumX=0, sumY=0, sumFunct=0;
@@ -298,12 +299,11 @@ implementation {
 			}
 		}
 	
-		//se ho gia' pututo ottenere dei valori di coordinate inziiali mediate
+		//se ho gia' pututo ottenere dei valori di coordinate iniziali mediate
 		//non ci sono problemi. Se invece ho un solo nodo, e' ovvio che la formula di sqrt
 		//dara' sempre 0, allora sommo apposta 5 (valore scelto a caso), per introdurre
 		//una piccola variazione nelle coordinate e far si che l'algoritmo possa
-		//generare risultati diversi da 0...molto sballati, ovvio, ha solo l'info di un nodo,
-		//ma meglio di niente
+		//generare risultati diversi da 0...molto sbagliati, ovvio, ha solo l'info di un nodo.
 		if(contX>=2 && contY >=2) {
 			posX = posX / contX;
 			posY = posY / contY;
@@ -442,6 +442,9 @@ implementation {
 		return Xg;
 	}
 	
+	
+	//funzione che crea la serie di 6 valori di varianza predefiniti che vengono utilizzati 
+	//dalla funzione getGaussian()
 	void fillVarianceArray() {
 		int i;
 		for (i=0; i < 6; i++) {

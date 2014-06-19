@@ -19,9 +19,7 @@ module AnchorNodeC {
 
 implementation {
   message_t packet;
-    
   void sendPacket();
-  
   
   event void Boot.booted() {
 	printf("Anchor Mote %d booted...\n", TOS_NODE_ID);
@@ -29,14 +27,10 @@ implementation {
 	call Time10Sec.startOneShot(WAIT_BEFORE_SYNC);
   }
   
-    //***************** RadioControl interface ********************//
-  event void RadioControl.startDone(error_t err){
-  	
-  }
+  event void RadioControl.startDone(error_t err){}
   
   event void RadioControl.stopDone(error_t err){}
   
-  //***************** MilliTimer interface ********************//
   event void TimeOut.fired() {
 	call Time10.startOneShot(TIMESLOT*TOS_NODE_ID);
   }
@@ -45,9 +39,8 @@ implementation {
   	sendPacket();
   }
   
-  //*********************************************************//
+  //************************Invia pacchetto al mobile node*********************************//
   void sendPacket() {
-  	
 	nodeMessage_t* mess = (nodeMessage_t*) (call Packet.getPayload(&packet,sizeof(nodeMessage_t)));
 	mess->msg_type = REQ;
 	mess->mode_type = ANCHOR;
@@ -63,7 +56,7 @@ implementation {
   }
  
  
- //*********************************************************//
+ //************************Invia pacchetto di sync*********************************//
   void sendPacketSync() {
 	nodeMessage_t* mess = (nodeMessage_t*) (call Packet.getPayload(&packet,sizeof(nodeMessage_t)));
 	mess->msg_type = SYNCPACKET;
@@ -73,21 +66,17 @@ implementation {
   }
  
  
-  //********************* AMSend interface ****************//
+  //*********************AMSend interface****************//
   event void AMSend.sendDone(message_t* buf,error_t err) {
-
-    if(&packet == buf && err == SUCCESS ) {
-    
-    }
-
+    if(&packet == buf && err == SUCCESS ) {}
   }
 
 	event void Time10Sec.fired(){
 		//prima mando sync, solo se sono l'ancora 1
-		
 		if(TOS_NODE_ID == 1) {
 			sendPacketSync();			
-			//dopo avvio broadcast normale
+			
+			//dopo avvio broadcast normale in TDMA per ancora 1
 			call Time10.startOneShot(TIMESLOT*TOS_NODE_ID);
 		}
 	}
@@ -95,15 +84,14 @@ implementation {
 	event message_t * Receive.receive(message_t* buf,void* payload, uint8_t len) {
 		am_addr_t sourceNodeId = call AMPacket.source(buf);	
 		nodeMessage_t* mess = (nodeMessage_t*) payload;
-		
 	
 		if ( mess->msg_type == SYNCPACKET) {
 			printf("Anchor %d -> SyncPacket received from anchor %d...\n", TOS_NODE_ID, sourceNodeId);
 			
-			//dopo avvio broadcast normale
+			//avvio dopo un tempo definito in modo da creare gli slot
+			//di fatto implementando il TDMA per i nodi restanti
 			call Time10.startOneShot(TIMESLOT*TOS_NODE_ID);
 		}
-		
 		return buf;
 	}
 }

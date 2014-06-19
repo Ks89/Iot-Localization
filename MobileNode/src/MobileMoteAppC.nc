@@ -16,20 +16,15 @@ implementation {
   components MobileMoteC as App;
   components RandomC;
   
-  
-  //Radio Control
   App.RadioControl -> ActiveMessageC;
   App.Boot -> MainC.Boot;
   App.TimeOut250 -> TimeOut250;
   App.TimeOut150 -> TimeOut150;
   
-  //Send and Receive interfaces
   App.Receive -> AMReceiverC;
   App.AMSend -> AMSenderC;
-
-  //Interfaces to access package fields
   App.AMPacket -> AMSenderC;
   App.Packet -> AMSenderC;
  
- App.Random -> RandomC;
+  App.Random -> RandomC;
 }
