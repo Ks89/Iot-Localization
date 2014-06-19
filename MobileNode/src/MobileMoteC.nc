@@ -14,6 +14,7 @@ module MobileMoteC {
 		interface Packet;
 		interface Receive;
 		interface Timer<TMilli> as TimeOut;
+		interface Random;
 	}
 }
 
@@ -42,9 +43,9 @@ implementation {
 	int time = 0;
 	
 	message_t packet;
- 	
- 	int16_t calcRSSI(float x, float y);
- 	
+	
+	int16_t calcRSSI(float x, float y);
+	
 	void calcDist();
 	void findTopNode();
 	void initNodeArray(nodeValue *array);
@@ -53,7 +54,8 @@ implementation {
 	float distFromRSSI(int16_t RSSI);
 	void getPosition();
 	void printfFloat(float toBePrinted);
-	int16_t getGaussian();
+	float getGaussian();
+	float rand_gauss();
  
  
 	//***************** Boot interface ********************//
@@ -88,7 +90,7 @@ implementation {
 		printf(",");
 		printfFloat(mobileCoord[time].y);
 		printf(")\n");
-		
+	
 		findTopNode();
 		calcDist();
 		getPosition();
@@ -102,13 +104,12 @@ implementation {
 
 	//***************************** Receive interface *****************//
 	event message_t* Receive.receive(message_t* buf,void* payload, uint8_t len) {
-
 		am_addr_t sourceNodeId = call AMPacket.source(buf);	
 		nodeMessage_t* mess = (nodeMessage_t*) payload;
 		printf("Message received from %d...\n", sourceNodeId);
 	
 		if ( mess->msg_type == REQ && mess->mode_type == ANCHOR ) {
-			
+	
 			RSSIArray[sourceNodeId-1].rssiVal = calcRSSI(mess->x,mess->y);
 			RSSIArray[sourceNodeId-1].nodeId = sourceNodeId;
 			printf("RSSI calculated: %d from %d\n",RSSIArray[sourceNodeId-1].rssiVal,sourceNodeId);
@@ -180,28 +181,18 @@ implementation {
 		float distance;
 		distance = sqrtf(powf(x-mobileCoord[time].x,2)+powf(y-mobileCoord[time].y,2));
 		rssi = -60 - 10 * log10f(distance)+getGaussian();
-		
-//		printf("(x=");
-//		printfFloat(x);
-//		printf(", y=");
-//		printfFloat(y);
-//		printf(") - mobile:(x=");
-//		printfFloat(mobileCoord[time].x);
-//		printf(", y=");
-//		printfFloat(mobileCoord[time].y);
-//		printf(")\ndistance=");
-//		printfFloat(distance);
-//		printf("\nlog10f(distance)=");
-//		printfFloat(log10f(distance));
-//		printf("\nrssi=");
-//		printfFloat(rssi);
-//		printf("\n");
-		
 		return rssi;
 	}
 	
-	int16_t getGaussian() {
-		return 0;
+	//
+	float getGaussian() {
+		float var = 0; 
+		//0 e' la media che deve restare nulla perche' detto dalle specifiche
+		float gauss = ( rand_gauss() * var ) + 0;
+		printf("gaussian: ");
+		printfFloat(gauss);
+		printf("\n");
+		return gauss;
 	}
 	
 	//funzione che partendo dalla top 3 dei nodi con piu' potenza ne calcola la distanza
@@ -231,7 +222,7 @@ implementation {
 	float distFromRSSI(int16_t RSSI) {
 		float res, p;
 		float rssi = RSSI;
-		
+	
 		//senza la conversione in float la formula viene approssimata
 		//male e per quale motivo oscuro da sempre 10 come risultato
 		p = (-60-rssi)/10;
@@ -239,7 +230,7 @@ implementation {
 		return res;
 	}
  
- 	//funzione per calcolare la posizione stimata del nodo mobile.
+	//funzione per calcolare la posizione stimata del nodo mobile.
 	//presuppone di avere gia' tutti i dati e soprattutto le posizioni dei nodi anchor
 	//nel vettore anchorCoord
 	//PER ORA METTO DENTRO IO DEI VALORI A MUZZO SOLO PER PROVARE LA FUNZIONE
@@ -248,15 +239,14 @@ implementation {
 		float sqrtValue, partOne, sumX=0, sumY=0, sumFunct=0;
 		float alpha = 0.8; //parte da un valore elevato apposta
 		float functToMin=9998, functToMinPrev=9999;
-		
+	
 		//medio le posizioni dei tre nodi in topNode perche' piu' vicini 
 		posX=(anchorCoord[topNode[0].nodeId].x+anchorCoord[topNode[1].nodeId].x+anchorCoord[topNode[2].nodeId].x)/3;
 		posY=(anchorCoord[topNode[0].nodeId].y+anchorCoord[topNode[1].nodeId].y+anchorCoord[topNode[2].nodeId].y)/3;
-		
+	
 		//functToMinPrev e' la funzione costo al passo precedente.
 		//functToMin e' quella al passo attuale 
 		while(functToMin < functToMinPrev ) {
-			printf("CICLO WHILE\n");
 			j++;
 			sumFunct = 0;
 			sumX = 0;
@@ -276,23 +266,6 @@ implementation {
 				}	
 			}
 
-			//			printf("topthreenode: %d %d %d",topThreeNode[0].nodeId-1,topThreeNode[1].nodeId-1,topThreeNode[2].nodeId-1);
-			//			printf("\nanchorCoordX:");
-			//			printfFloat(anchorCoord[topThreeNode[0].nodeId-1].x);
-			//			printf("\n");
-			//			printfFloat(anchorCoord[topThreeNode[1].nodeId-1].x);
-			//			printf("\n");
-			//			printfFloat(anchorCoord[topThreeNode[2].nodeId-1].x);
-			//			printf("\n");
-			//			
-			//			printf("\nanchorCoordY:");
-			//			printfFloat(anchorCoord[topThreeNode[0].nodeId-1].y);
-			//			printf("\n");
-			//			printfFloat(anchorCoord[topThreeNode[1].nodeId-1].y);
-			//			printf("\n");
-			//			printfFloat(anchorCoord[topThreeNode[2].nodeId-1].y);
-			//			printf("\n");
-	
 			//calcolo x e y
 			for(i=0;i<3;i++) {
 				sqrtValue = sqrtf(powf(posX-anchorCoord[topNode[i].nodeId-1].x,2) 
@@ -302,47 +275,28 @@ implementation {
 				sumY = sumY + (partOne * (posY - anchorCoord[topNode[i].nodeId-1].y));
 	
 				sumFunct = sumFunct + powf((sqrtValue - distArray[i]),2);
-	
-				//				printf("\nCICLO FOR %d, sqrtValue ", i);
-				//				printfFloat(sqrtValue);
-				//				printf("\npartOne ");
-				//				printfFloat(partOne);
-				//				printf("\nsumX ");
-				//				printfFloat(sumX);
-				//				printf("\nsumY ");
-				//				printfFloat(sumY);
-				//				printf("\nsumFunct ");
-				//				printfFloat(sumFunct);
-				//				printf("\n");
 			}
 	
 			//calcolo x e y stimate 
 			posX = posX - (alpha * sumX);
 			posY = posY - (alpha * sumY);
-			
-			printf("\nX ");
-			printfFloat(posX);
-			printf("\nY ");
-			printfFloat(posY);
-			printf("\n");
 	
 			//aggiorno funzione precedente con l'attuale
 			functToMinPrev = functToMin;
 	
 			//calcolo la funzione da minimizzare
 			functToMin = (0.5) * sumFunct;
-	
-			printf("\nfunctToMin= ");
-			printfFloat(functToMin);
-			printf("\nfunctToMinPrev= ");
-			printfFloat(functToMinPrev);
-			printf("\n");
 		}
 	
 		//uscito dal while ho i 2 volari di x e y stimati finali
 		//perche' la funzione e' minimizzata, visto che al passo successivo
 		//aumenta, quindi la funzione minimizzata finale e' dentro a functToMinPrev
-		printf("\niteraz while= %d\n",j);
+		printf("\nMobileNode estimated position=(");
+		printfFloat(posX);
+		printf(" , ");
+		printfFloat(posY);
+		printf(")\n");
+		printf("Dopo %d iteraz del while\n",j);
 	}
  
 	//utility
@@ -371,4 +325,31 @@ implementation {
 		f5 = f*1000000; f5 %= 10;
 		printf("%c%ld.%d%d%d%d%d%d", c, fi, (uint8_t) f0, (uint8_t) f1, (uint8_t) f2, (uint8_t) f3, (uint8_t) f4, (uint8_t) f5);
 	}
+	
+	
+	//http://c-faq.com/lib/gaussian.html
+	float rand_gauss (void) {
+		static float V1, V2, S;
+		static int phase = 0;
+		float X;
+
+		if(phase == 0) {
+			do {
+				float U1 = (float)(call Random.rand16()) / 30000;
+				float U2 = (float)(call Random.rand16()) / 30000;
+
+				V1 = 2 * U1 - 1;
+				V2 = 2 * U2 - 1;
+				S = V1 * V1 + V2 * V2;
+			} while(S >= 1 || S == 0);
+
+			X = V1 * sqrtf(-2 * log10f(S) / S);
+		} else
+			X = V2 * sqrtf(-2 * log10f(S) / S);
+
+		phase = 1 - phase;
+
+		return X;
+	}
+	
 }

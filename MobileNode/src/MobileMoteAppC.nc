@@ -13,6 +13,7 @@ implementation {
   components new TimerMilliC() as TimeOut;
   components ActiveMessageC;
   components MobileMoteC as App;
+  components RandomC;
   
   
   //Radio Control
@@ -28,4 +29,5 @@ implementation {
   App.AMPacket -> AMSenderC;
   App.Packet -> AMSenderC;
  
+ App.Random -> RandomC;
 }
