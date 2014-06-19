@@ -45,10 +45,10 @@ implementation {
 	
 	
 	//----->GRAFICO FINALE = errore nel determinare la posizione (cioe' distanze tra posizione stimata e reale)
-	float errorDist[64];
+	float errorDist[24];
 	
 	//----->GRAFICO FINALE = i valori crescenti di varianza che sono fissi
-	float variance[16];
+	float variance[6];
 	
 	
 	//movimento del nodo mobile, ogni istante di tempo (time)
@@ -76,7 +76,7 @@ implementation {
  
 	//***************** Boot interface ********************//
 	event void Boot.booted() {
-		printf("Mobile Mote booted.\n");
+		printf("[Mobile] Mobile Mote booted.\n");
 		initNodeArray(RSSIArray);
 		initNodeArray(RSSISaved);
 		initNodeArray(topNode);
@@ -106,9 +106,9 @@ implementation {
 		for(j=0;j<8;j++) {
 			RSSISaved[j] = RSSIArray[j];
 		}
-		initNodeArray(RSSIArray);
+		//initNodeArray(RSSIArray);
 	
-		printf("-------------------->MobileNode : position (");
+		printf("[Mobile]-------------------->MobileNode : position (");
 		printfFloat(mobileCoord[time].x);
 		printf(",");
 		printfFloat(mobileCoord[time].y);
@@ -142,13 +142,13 @@ implementation {
 	event message_t* Receive.receive(message_t* buf,void* payload, uint8_t len) {
 		am_addr_t sourceNodeId = call AMPacket.source(buf);	
 		nodeMessage_t* mess = (nodeMessage_t*) payload;
-		printf("Message received from %d...\n", sourceNodeId);
+		printf("[Mobile]Message received from %d... type %d\n", sourceNodeId, mess->msg_type);
 	
 		if ( mess->msg_type == REQ && mess->mode_type == ANCHOR ) {
 	
 			RSSIArray[sourceNodeId-1].rssiVal = calcRSSI(mess->x,mess->y);
 			RSSIArray[sourceNodeId-1].nodeId = sourceNodeId;
-			printf("RSSI calculated: %d from %d\n",RSSIArray[sourceNodeId-1].rssiVal,sourceNodeId);
+			printf("[Mobile]RSSI calculated: %d from %d\n",RSSIArray[sourceNodeId-1].rssiVal,sourceNodeId);
 			
 			if(!(call TimeOut150.isRunning())) {
 				call TimeOut150.startOneShot(RECEIVE_INTERVAL_ANCHOR);
@@ -186,7 +186,7 @@ implementation {
 	
 	void initErrorDistanceArray() {
 		int i;
-		for(i=0;i<64;i++) {
+		for(i=0;i<24;i++) {
 			errorDist[i] = -999;
 		}
 	}
@@ -196,7 +196,7 @@ implementation {
 	void findTopNode(){
 		int j;
 		for(j=0;j<8;j++) {
-			printf("Node=%d, RSSI=%d\n", RSSISaved[j].nodeId, RSSISaved[j].rssiVal);
+			printf("[Mobile]Node=%d, RSSI=%d\n", RSSISaved[j].nodeId, RSSISaved[j].rssiVal);
 		}
 	
 		for(j=0; j<8; ++j) {
@@ -217,9 +217,9 @@ implementation {
 			}
 		}
 	
-		printf("Best nodeID = %d with RSSI = %d\n",topNode[0].nodeId,topNode[0].rssiVal);
-		printf("Second nodeID = %d with RSSI = %d\n",topNode[1].nodeId,topNode[1].rssiVal);
-		printf("Third nodeID = %d with RSSI = %d\n",topNode[2].nodeId,topNode[2].rssiVal);
+		printf("[Mobile]Best nodeID = %d with RSSI = %d\n",topNode[0].nodeId,topNode[0].rssiVal);
+		printf("[Mobile]Second nodeID = %d with RSSI = %d\n",topNode[1].nodeId,topNode[1].rssiVal);
+		printf("[Mobile]Third nodeID = %d with RSSI = %d\n",topNode[2].nodeId,topNode[2].rssiVal);
 	}
 	
 	int16_t calcRSSI(float x, float y) {
@@ -235,7 +235,7 @@ implementation {
 		float var = variance[cycle]; 
 		//0 e' la media che deve restare nulla perche' detto dalle specifiche
 		float gauss = ( rand_gauss() * var ) + 0;
-		printf("gaussian: ");
+		printf("[Mobile]gaussian: ");
 		printfFloat(gauss);
 		printf("\n");
 		return gauss;
@@ -258,7 +258,7 @@ implementation {
 		//stampo array distanze per vedere i risultati
 		for(i=0;i<3;i++) {
 			if(distArray[i]!=-999) {
-				printf("\n>>>Position in chart %d, distance = ", i+1);
+				printf("\n[Mobile]>>>Position in chart %d, distance = ", i+1);
 				printfFloat(distArray[i]);
 			}
 		}
@@ -313,7 +313,7 @@ implementation {
 		}
 	
 	
-		printf("Initial position(");
+		printf("[Mobile]Initial position(");
 		printfFloat(posX);
 		printf(",");
 		printfFloat(posY);
@@ -331,15 +331,15 @@ implementation {
 			//che diminuisce col passare del tempo (cioe' all'aumentare delle iterazioni).
 			//Questo per far si che l'algoritmo diventi piu' preciso man mano che si avvicina
 			//alla soluzione. 
-//			if(j>3 && j<=10) {
-//				alpha = 0.6;
-//			} else {
-//				if(j>10 && j<=20) {
-//					alpha = 0.5;
-//				} else {
-//					alpha = 0.1;
-//				}	
-//			}
+			if(j>3 && j<=10) {
+				alpha = 0.6;
+			} else {
+				if(j>10 && j<=20) {
+					alpha = 0.5;
+				} else {
+					alpha = 0.1;
+				}	
+			}
 
 			//calcolo x e y
 			for(i=0;i<3;++i) {
@@ -368,12 +368,12 @@ implementation {
 		//uscito dal while ho i 2 volari di x e y stimati finali
 		//perche' la funzione e' minimizzata, visto che al passo successivo
 		//aumenta, quindi la funzione minimizzata finale e' dentro a functToMinPrev
-		printf("\nMobileNode estimated position=(");
+		printf("\n[Mobile]MobileNode estimated position=(");
 		printfFloat(posX);
 		printf(" , ");
 		printfFloat(posY);
 		printf(")\n");
-		printf("Dopo %d iteraz del while\n",j);
+		printf("[Mobile]Dopo %d iteraz del while\n",j);
 	}
  
 	//funzione per calcolare l'errore, cioe'  la distanza tra posizione stimata e quella reale (sara' asse y
@@ -382,7 +382,7 @@ implementation {
 		errorDist[time] = sqrtf(powf(mobileCoord[time].x - posX,2) 
 				+ powf(mobileCoord[time].y - posY,2));
 				
-		printf("Error: ");
+		printf("[Mobile]Error: ");
 		printfFloat(errorDist[time]);
 		printf(" at time: %d, with variance: ", time);
 		printfFloat(variance[time]);
@@ -444,8 +444,8 @@ implementation {
 	
 	void fillVarianceArray() {
 		int i;
-		for (i=0; i < 16; i++) {
-			variance[i] = i/2.5;
+		for (i=0; i < 6; i++) {
+			variance[i] = i/6.0;
 		}
 	}	
 }

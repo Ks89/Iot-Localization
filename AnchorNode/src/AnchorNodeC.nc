@@ -95,10 +95,10 @@ implementation {
 	event message_t * Receive.receive(message_t* buf,void* payload, uint8_t len) {
 		am_addr_t sourceNodeId = call AMPacket.source(buf);	
 		nodeMessage_t* mess = (nodeMessage_t*) payload;
-		printf("Anchor %d -> Message received from anchor %d...\n", TOS_NODE_ID, sourceNodeId);
+		
 	
 		if ( mess->msg_type == SYNCPACKET) {
-			printf("SyncPacket received");
+			printf("Anchor %d -> SyncPacket received from anchor %d...\n", TOS_NODE_ID, sourceNodeId);
 			
 			//dopo avvio broadcast normale
 			call Time10.startOneShot(TIMESLOT*TOS_NODE_ID);

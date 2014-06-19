@@ -14,33 +14,23 @@ typedef struct coordinate {
 } coord;
 
 coord anchorCoord[8] = {
-	{20, 10},
-	{40, 10},
-	{60, 10},
-	{80, 10},
-	{20, 40},
-	{40, 40},
-	{60, 40},
-	{80, 40}
+	{5, 5},
+	{10, 5},
+	{15, 5},
+	{20, 5},
+	{5, 10},
+	{10, 10},
+	{15, 10},
+	{20, 10}
 };  
 
-coord mobileCoord[16] = {
-	{10, 20},
-	{20, 30},
-	{30, 30},
-	{40, 20},
-	{50, 10},
-	{60, 10},
-	{60, 30},
-	{60, 20},
-	{70, 20},
-	{70, 30},
-	{80, 40},
-	{90, 30},
-	{100, 20},
-	{100, 20},
-	{120, 30},
-	{140, 10}		
+coord mobileCoord[6] = {
+	{4, 8},
+	{8, 8},
+	{12, 8},
+	{12, 10},
+	{15, 8},
+	{22, 8}		
 };
 
 
@@ -53,7 +43,7 @@ coord mobileCoord[16] = {
 
 #define MOVE_INTERVAL_MOBILE 1000
 #define SEND_INTERVAL_ANCHOR 250
-#define RECEIVE_INTERVAL_ANCHOR 150
+#define RECEIVE_INTERVAL_ANCHOR 180
 #define AM_RSSIMSG 10
 
 #endif

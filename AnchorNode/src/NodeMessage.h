@@ -14,15 +14,15 @@ typedef struct coordinate {
 } coord;
 
 coord anchorCoord[8] = {
-	{20, 10},
-	{40, 10},
-	{60, 10},
-	{80, 10},
-	{20, 40},
-	{40, 40},
-	{60, 40},
-	{80, 40}
-};   
+	{5, 5},
+	{10, 5},
+	{15, 5},
+	{20, 5},
+	{5, 10},
+	{10, 10},
+	{15, 10},
+	{20, 10}
+};  
 
 #define REQ 1
 #define RESP 2
@@ -32,9 +32,9 @@ coord anchorCoord[8] = {
 #define SYNCPACKET 3
 
 #define SEND_INTERVAL_ANCHOR 250
-#define WAIT_BEFORE_SYNC 10000
+#define WAIT_BEFORE_SYNC 5000
 #define AM_RSSIMSG 10
-#define TIMESLOT 10
+#define TIMESLOT 7
 
 
 #endif
