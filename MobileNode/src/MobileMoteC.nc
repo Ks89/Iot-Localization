@@ -139,6 +139,9 @@ implementation {
 		nodeMessage_t* mess = (nodeMessage_t*) payload;
 		printf("Message received from %d...\n", sourceNodeId);
 	
+//		if(mess->msg_type == SYNCPACKET) {
+			
+	
 		if ( mess->msg_type == REQ && mess->mode_type == ANCHOR ) {
 	
 			RSSIArray[sourceNodeId-1].rssiVal = calcRSSI(mess->x,mess->y);
@@ -146,7 +149,7 @@ implementation {
 			printf("RSSI calculated: %d from %d\n",RSSIArray[sourceNodeId-1].rssiVal,sourceNodeId);
 			
 			if(!(call TimeOut250.isRunning())) {
-				call TimeOut250.startOneShot(SEND_INTERVAL_ANCHOR-100);
+				call TimeOut250.startOneShot(SEND_INTERVAL_ANCHOR);
 			}		
 		}
 		return buf;

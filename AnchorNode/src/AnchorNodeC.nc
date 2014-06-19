@@ -9,8 +9,10 @@ module AnchorNodeC {
   		interface Boot;
 	    interface AMPacket;
 	    interface AMSend;
+	    interface Receive;
 	    interface Packet;
 	    interface Timer<TMilli> as TimeOut;
+	    interface Timer<TMilli> as Time10Sec;
 	}
 }
 
@@ -27,7 +29,7 @@ implementation {
   
     //***************** RadioControl interface ********************//
   event void RadioControl.startDone(error_t err){
-  	call TimeOut.startOneShot(SEND_INTERVAL_ANCHOR);
+  	call Time10Sec.startOneShot(WAIT_BEFORE_SYNC);
   }
   
   event void RadioControl.stopDone(error_t err){}
@@ -54,6 +56,17 @@ implementation {
 
   }
  
+ 
+ //*********************************************************//
+  void sendPacketSync() {
+	nodeMessage_t* mess = (nodeMessage_t*) (call Packet.getPayload(&packet,sizeof(nodeMessage_t)));
+	mess->msg_type = SYNCPACKET;
+	 
+	printf("Try to broadcast the sync message... \n");
+	call AMSend.send(AM_BROADCAST_ADDR,&packet,sizeof(nodeMessage_t));
+  }
+ 
+ 
   //********************* AMSend interface ****************//
   event void AMSend.sendDone(message_t* buf,error_t err) {
 
@@ -62,4 +75,30 @@ implementation {
     }
 
   }
+
+	event void Time10Sec.fired(){
+		//prima mando sync, solo se sono l'ancora 1
+		
+		if(TOS_NODE_ID == 1) {
+			sendPacketSync();
+			
+			//dopo avvio broadcast normale
+			call TimeOut.startOneShot(SEND_INTERVAL_ANCHOR);
+		}
+	}
+
+	event message_t * Receive.receive(message_t* buf,void* payload, uint8_t len) {
+		am_addr_t sourceNodeId = call AMPacket.source(buf);	
+		nodeMessage_t* mess = (nodeMessage_t*) payload;
+		printf("Anchor %d -> Message received from anchor %d...\n", TOS_NODE_ID, sourceNodeId);
+	
+		if ( mess->msg_type == SYNCPACKET) {
+			printf("SyncPacket received");
+			
+			//dopo avvio broadcast normale
+			call TimeOut.startOneShot(SEND_INTERVAL_ANCHOR);
+		}
+		
+		return buf;
+	}
 }

@@ -29,8 +29,10 @@ coord anchorCoord[8] = {
 
 #define MOBILE 1
 #define ANCHOR 2
+#define SYNCPACKET 3
 
-#define SEND_INTERVAL_ANCHOR 250
+#define SEND_INTERVAL_ANCHOR 200
+#define WAIT_BEFORE_SYNC 10000
 #define AM_RSSIMSG 10
 
 
