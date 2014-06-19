@@ -246,13 +246,13 @@ implementation {
 	void getPosition() {
 		int i,j=0;
 		float sqrtValue, partOne, sumX=0, sumY=0, sumFunct=0;
-		float alpha = 0.5; //parte da un valore elevato apposta
+		float alpha = 0.8; //parte da un valore elevato apposta
 		float functToMin=9998, functToMinPrev=9999;
-	
+		
 		//medio le posizioni dei tre nodi in topNode perche' piu' vicini 
 		posX=(anchorCoord[topNode[0].nodeId].x+anchorCoord[topNode[1].nodeId].x+anchorCoord[topNode[2].nodeId].x)/3;
 		posY=(anchorCoord[topNode[0].nodeId].y+anchorCoord[topNode[1].nodeId].y+anchorCoord[topNode[2].nodeId].y)/3;
-	
+		
 		//functToMinPrev e' la funzione costo al passo precedente.
 		//functToMin e' quella al passo attuale 
 		while(functToMin < functToMinPrev ) {
@@ -266,16 +266,16 @@ implementation {
 			//che diminuisce col passare del tempo (cioe' all'aumentare delle iterazioni).
 			//Questo per far si che l'algoritmo diventi piu' preciso man mano che si avvicina
 			//alla soluzione. 
-			if(j>4) {
-				alpha = 0.3;
+			if(j>3 && j<=10) {
+				alpha = 0.6;
 			} else {
-				if(j>6) {
-					alpha = 0.2;
+				if(j>10 && j<=20) {
+					alpha = 0.5;
 				} else {
 					alpha = 0.1;
 				}	
 			}
-	
+
 			//			printf("topthreenode: %d %d %d",topThreeNode[0].nodeId-1,topThreeNode[1].nodeId-1,topThreeNode[2].nodeId-1);
 			//			printf("\nanchorCoordX:");
 			//			printfFloat(anchorCoord[topThreeNode[0].nodeId-1].x);
@@ -319,7 +319,7 @@ implementation {
 			//calcolo x e y stimate 
 			posX = posX - (alpha * sumX);
 			posY = posY - (alpha * sumY);
-	
+			
 			printf("\nX ");
 			printfFloat(posX);
 			printf("\nY ");
