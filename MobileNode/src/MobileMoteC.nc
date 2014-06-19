@@ -40,6 +40,16 @@ implementation {
 	
 	//posizione stimata del nodo mobile
 	float posX, posY;
+	
+	
+	//----->GRAFICO FINALE = errore nel determinare la posizione (cioe' distanze tra posizione stimata e reale)
+	float errorDist[16];
+	
+	//----->GRAFICO FINALE = i valori crescenti di varianza che sono fissi
+	float variance[16] = {0, 1, 1, 1.5, 2, 2, 3, 3, 4, 4.5, 5, 6, 7, 8, 9, 10};
+	
+	
+	//movimento del nodo mobile, ogni istante di tempo (time)
 	int time = 0;
 	
 	message_t packet;
@@ -51,8 +61,10 @@ implementation {
 	void initNodeArray(nodeValue *array);
 	void initTopArray(nodeValue *array);
 	void initDistArray();
+	void initErrorDistanceArray();
 	float distFromRSSI(int16_t RSSI);
 	void getPosition();
+	void getError();
 	void printfFloat(float toBePrinted);
 	float getGaussian();
 	float rand_gauss();
@@ -65,6 +77,7 @@ implementation {
 		initNodeArray(RSSISaved);
 		initNodeArray(topNode);
 		initDistArray();
+		initErrorDistanceArray();
 		call RadioControl.start();
 	}
  
@@ -94,10 +107,14 @@ implementation {
 		findTopNode();
 		calcDist();
 		getPosition();
+		getError();
+		
+		//e poi inizializzo per il movimento successivo, cioe' nell'istante di tempo time++
 		initNodeArray(RSSIArray);
 		initNodeArray(RSSISaved);
 		initTopArray(topNode);
 		initDistArray();
+		initErrorDistanceArray();
 		time++;
 	}
 
@@ -144,7 +161,14 @@ implementation {
 			distArray[i] = -999;
 		}
 	}
- 
+	
+	void initErrorDistanceArray() {
+		int i;
+		for(i=0;i<16;i++) {
+			errorDist[i] = -999;
+		}
+	}
+	
 	//metodo che crea la top 3 dei nodi con potenza piu' alta ordinati 
 	//in [0],[1] e [2] in modo crescente  
 	void findTopNode(){
@@ -186,7 +210,7 @@ implementation {
 	
 	//
 	float getGaussian() {
-		float var = 1; 
+		float var = variance[time]; 
 		//0 e' la media che deve restare nulla perche' detto dalle specifiche
 		float gauss = ( rand_gauss() * var ) + 0;
 		printf("gaussian: ");
@@ -328,6 +352,19 @@ implementation {
 		printfFloat(posY);
 		printf(")\n");
 		printf("Dopo %d iteraz del while\n",j);
+	}
+ 
+	//funzione per calcolare l'errore, cioe'  la distanza tra posizione stimata e quella reale (sara' asse y
+	//del grafico finale da mettere nelle specifiche)
+	void getError() {
+		errorDist[time] = sqrtf(powf(mobileCoord[time].x - posX,2) 
+				+ powf(mobileCoord[time].y - posY,2));
+				
+		printf("Error: ");
+		printfFloat(errorDist[time]);
+		printf(" at time: %d, with variance: ", time);
+		printfFloat(variance[time]);
+		printf("\n");
 	}
  
 	//utility
