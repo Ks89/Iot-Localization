@@ -186,7 +186,7 @@ implementation {
 	
 	//
 	float getGaussian() {
-		float var = 0; 
+		float var = 1; 
 		//0 e' la media che deve restare nulla perche' detto dalle specifiche
 		float gauss = ( rand_gauss() * var ) + 0;
 		printf("gaussian: ");
@@ -239,10 +239,39 @@ implementation {
 		float sqrtValue, partOne, sumX=0, sumY=0, sumFunct=0;
 		float alpha = 0.8; //parte da un valore elevato apposta
 		float functToMin=9998, functToMinPrev=9999;
+		float contX=0, contY=0;
 	
-		//medio le posizioni dei tre nodi in topNode perche' piu' vicini 
-		posX=(anchorCoord[topNode[0].nodeId].x+anchorCoord[topNode[1].nodeId].x+anchorCoord[topNode[2].nodeId].x)/3;
-		posY=(anchorCoord[topNode[0].nodeId].y+anchorCoord[topNode[1].nodeId].y+anchorCoord[topNode[2].nodeId].y)/3;
+	
+		//calcolo le posX e posY evitando i nodi che hanno -999 come id, cioe' non sono in range
+		for(i=0;i<3;i++) {
+			if(topNode[i].nodeId!=-999 && topNode[i].rssiVal!=-999) {
+				posX = posX + anchorCoord[topNode[i].nodeId-1].x;
+				contX++;
+				posY = posY + anchorCoord[topNode[i].nodeId-1].y;
+				contY++;
+			}
+		}
+	
+		//se ho gia' pututo ottenere dei valori di coordinate inziiali mediate
+		//non ci sono problemi. Se invece ho un solo nodo, e' ovvio che la formula di sqrt
+		//dara' sempre 0, allora sommo apposta 5 (valore scelto a caso), per introdurre
+		//una piccola variazione nelle coordinate e far si che l'algoritmo possa
+		//generare risultati diversi da 0...molto sballati, ovvio, ha solo l'info di un nodo,
+		//ma meglio di niente
+		if(contX>=2 && contY >=2) {
+			posX = posX / contX;
+			posY = posY / contY;
+		} else {
+			posX = anchorCoord[topNode[0].nodeId-1].x + 5;
+			posY = anchorCoord[topNode[0].nodeId-1].y + 5;
+		}
+	
+	
+		printf("Initial position(");
+		printfFloat(posX);
+		printf(",");
+		printfFloat(posY);
+		printf(")");
 	
 		//functToMinPrev e' la funzione costo al passo precedente.
 		//functToMin e' quella al passo attuale 
@@ -267,14 +296,16 @@ implementation {
 			}
 
 			//calcolo x e y
-			for(i=0;i<3;i++) {
-				sqrtValue = sqrtf(powf(posX-anchorCoord[topNode[i].nodeId-1].x,2) 
-						+ powf(posY-anchorCoord[topNode[i].nodeId-1].y,2));
-				partOne = 1 - (distArray[i]/sqrtValue);
-				sumX = sumX + (partOne * (posX - anchorCoord[topNode[i].nodeId-1].x));
-				sumY = sumY + (partOne * (posY - anchorCoord[topNode[i].nodeId-1].y));
+			for(i=0;i<3;++i) {
+				if(topNode[i].nodeId!=-999 || topNode[i].rssiVal!=-999 || distArray[i]!=-999) {
+					sqrtValue = sqrtf(powf(posX-anchorCoord[topNode[i].nodeId-1].x,2) 
+							+ powf(posY-anchorCoord[topNode[i].nodeId-1].y,2));
+					partOne = 1 - (distArray[i]/sqrtValue);
+					sumX = sumX + (partOne * (posX - anchorCoord[topNode[i].nodeId-1].x));
+					sumY = sumY + (partOne * (posY - anchorCoord[topNode[i].nodeId-1].y));
 	
-				sumFunct = sumFunct + powf((sqrtValue - distArray[i]),2);
+					sumFunct = sumFunct + powf((sqrtValue - distArray[i]),2);
+				}
 			}
 	
 			//calcolo x e y stimate 
