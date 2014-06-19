@@ -83,6 +83,12 @@ implementation {
 			RSSISaved[j] = RSSIArray[j];
 		}
 	
+		printf("-------------------->MobileNode : position (");
+		printfFloat(mobileCoord[time].x);
+		printf(",");
+		printfFloat(mobileCoord[time].y);
+		printf(")\n");
+		
 		findTopNode();
 		calcDist();
 		getPosition();
@@ -173,7 +179,24 @@ implementation {
 		int16_t rssi;
 		float distance;
 		distance = sqrtf(powf(x-mobileCoord[time].x,2)+powf(y-mobileCoord[time].y,2));
-		rssi = -60 + 10 * log10f(distance)+getGaussian();
+		rssi = -60 - 10 * log10f(distance)+getGaussian();
+		
+//		printf("(x=");
+//		printfFloat(x);
+//		printf(", y=");
+//		printfFloat(y);
+//		printf(") - mobile:(x=");
+//		printfFloat(mobileCoord[time].x);
+//		printf(", y=");
+//		printfFloat(mobileCoord[time].y);
+//		printf(")\ndistance=");
+//		printfFloat(distance);
+//		printf("\nlog10f(distance)=");
+//		printfFloat(log10f(distance));
+//		printf("\nrssi=");
+//		printfFloat(rssi);
+//		printf("\n");
+		
 		return rssi;
 	}
 	
@@ -207,7 +230,11 @@ implementation {
 
 	float distFromRSSI(int16_t RSSI) {
 		float res, p;
-		p = (-60-RSSI)/10;
+		float rssi = RSSI;
+		
+		//senza la conversione in float la formula viene approssimata
+		//male e per quale motivo oscuro da sempre 10 come risultato
+		p = (-60-rssi)/10;
 		res = powf(10, p);
 		return res;
 	}

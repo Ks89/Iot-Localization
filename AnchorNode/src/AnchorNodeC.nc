@@ -43,8 +43,8 @@ implementation {
 	nodeMessage_t* mess = (nodeMessage_t*) (call Packet.getPayload(&packet,sizeof(nodeMessage_t)));
 	mess->msg_type = REQ;
 	mess->mode_type = ANCHOR;
-	mess->x = anchorCoord[TOS_NODE_ID].x;
-	mess->y = anchorCoord[TOS_NODE_ID].y;
+	mess->x = anchorCoord[TOS_NODE_ID-1].x;
+	mess->y = anchorCoord[TOS_NODE_ID-1].y;
 	 
 	printf("Try to broadcast the message... \n");
 	call AMSend.send(AM_BROADCAST_ADDR,&packet,sizeof(nodeMessage_t));
