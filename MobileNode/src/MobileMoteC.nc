@@ -132,9 +132,10 @@ implementation {
 		cycle++;
 		if(cycle %  4 == 0) {
 			X = 0; Y = 0;
-			//dopo aver preso le 4 misurazioni muovo il nodo mobile
+			//dopo aver preso le 4 misurazioni muovo il nodo mobile e resetto 
+			//cycle
 			time++;	
-			
+			cycle=0;
 		}
 	}
 
@@ -146,9 +147,10 @@ implementation {
 		printf("[MOBILE] Message received from anchor %d... type %d\n", sourceNodeId, mess->msg_type);
 	
 		if ( mess->msg_type == REQ && mess->mode_type == ANCHOR ) {
+			printf("[MOBILE] RSSI calculating: %d from %d\n",RSSIArray[sourceNodeId-1].rssiVal,sourceNodeId);
 			RSSIArray[sourceNodeId-1].rssiVal = calcRSSI(mess->x,mess->y);
 			RSSIArray[sourceNodeId-1].nodeId = sourceNodeId;
-			printf("[MOBILE] RSSI calculated: %d from %d\n",RSSIArray[sourceNodeId-1].rssiVal,sourceNodeId);
+			printf("[MOBILE] RSSI CALCULATED: %d from %d\n",RSSIArray[sourceNodeId-1].rssiVal,sourceNodeId);
 			
 			//se gia non sto ricevendo, attivo il timer180
 			if(!(call TimeOut180.isRunning())) {
@@ -234,8 +236,16 @@ implementation {
 	//	ottengo valore gaussiano v con varianza specificata dal vettore variance[cycle]
 	float getGaussian() {
 		float var = variance[cycle]; 
+		float gauss;
+		float randGauss = rand_gauss();
+		printf("[MOBILE] RandGaussian value: ");
+		printfFloat(randGauss);
+		printf(" _ variance = ");
+		printfFloat(var);
+		printf(" _ cycle = %d and time= %d ", cycle, time);
+
 		//0 e' la media che deve restare nulla perche' detto dalle specifiche
-		float gauss = ( rand_gauss() * var ) + 0;
+		gauss = ( randGauss * var ) + 0;
 		printf("[MOBILE] Gaussian value: ");
 		printfFloat(gauss);
 		printf("\n");
