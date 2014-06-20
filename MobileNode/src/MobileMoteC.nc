@@ -132,10 +132,8 @@ implementation {
 		cycle++;
 		if(cycle %  4 == 0) {
 			X = 0; Y = 0;
-			//dopo aver preso le 4 misurazioni muovo il nodo mobile e resetto 
-			//cycle
+			//dopo aver preso le 4 misurazioni muovo il nodo mobile
 			time++;	
-			cycle=0;
 		}
 	}
 
@@ -235,7 +233,7 @@ implementation {
 	
 	//	ottengo valore gaussiano v con varianza specificata dal vettore variance[cycle]
 	float getGaussian() {
-		float var = variance[cycle]; 
+		float var = variance[time]; 
 		float gauss;
 		float randGauss = rand_gauss();
 		printf("[MOBILE] RandGaussian value: ");
