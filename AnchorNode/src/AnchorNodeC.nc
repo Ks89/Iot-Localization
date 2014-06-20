@@ -53,7 +53,7 @@ implementation {
 	call AMSend.send(AM_BROADCAST_ADDR,&packet,sizeof(nodeMessage_t));
 	
 	call TimeOut.startOneShot(SEND_INTERVAL_ANCHOR);
-	printf("[ANCHOR %d] Starting timer...", TOS_NODE_ID);
+	printf("[ANCHOR %d] Starting timer...\n", TOS_NODE_ID);
 
   }
  

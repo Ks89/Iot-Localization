@@ -385,13 +385,13 @@ implementation {
 		printfFloat(posX);
 		printf(",");
 		printfFloat(posY);
-		printf(")");
+		printf(")\n");
 		
 		printf("[MOBILE] ERROR - Current position (");
 		printfFloat(mobileCoord[time].x);
 		printf(",");
 		printfFloat(mobileCoord[time].y);
-		printf(")");
+		printf(")\n");
 		
 		printf("[MOBILE] ERROR - Estimated error: ");
 		printfFloat(errorDist[time]);
