@@ -10,7 +10,7 @@ implementation {
   components MainC;  
   components new AMSenderC(AM_RSSIMSG);
   components new AMReceiverC(AM_RSSIMSG);
-  components new TimerMilliC() as TimeOut;
+  components new TimerMilliC() as TimeOut250;
   components ActiveMessageC;
   components MobileMoteC as App;
   components RandomC;
@@ -19,7 +19,7 @@ implementation {
   //Radio Control
   App.RadioControl -> ActiveMessageC;
   App.Boot -> MainC.Boot;
-  App.TimeOut -> TimeOut;
+  App.TimeOut250 -> TimeOut250;
   
   //Send and Receive interfaces
   App.Receive -> AMReceiverC;

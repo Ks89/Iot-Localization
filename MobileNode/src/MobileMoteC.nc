@@ -13,7 +13,7 @@ module MobileMoteC {
 		interface AMSend;
 		interface Packet;
 		interface Receive;
-		interface Timer<TMilli> as TimeOut;
+		interface Timer<TMilli> as TimeOut250;
 		interface Random;
 	}
 }
@@ -40,17 +40,19 @@ implementation {
 	
 	//posizione stimata del nodo mobile
 	float posX, posY;
+	float X = 0,Y = 0;
 	
 	
 	//----->GRAFICO FINALE = errore nel determinare la posizione (cioe' distanze tra posizione stimata e reale)
-	float errorDist[16];
+	float errorDist[64];
 	
 	//----->GRAFICO FINALE = i valori crescenti di varianza che sono fissi
-	float variance[16] = {0, 1, 1, 1.5, 2, 2, 3, 3, 4, 4.5, 5, 6, 7, 8, 9, 10};
+	float variance[16];
 	
 	
 	//movimento del nodo mobile, ogni istante di tempo (time)
 	int time = 0;
+	int cycle = 0;
 	
 	message_t packet;
 	
@@ -68,6 +70,7 @@ implementation {
 	void printfFloat(float toBePrinted);
 	float getGaussian();
 	float rand_gauss();
+	void fillVarianceArray();
  
  
 	//***************** Boot interface ********************//
@@ -78,6 +81,7 @@ implementation {
 		initNodeArray(topNode);
 		initDistArray();
 		initErrorDistanceArray();
+		fillVarianceArray();
 		call RadioControl.start();
 	}
  
@@ -91,12 +95,13 @@ implementation {
 	}
 
 
-	event void TimeOut.fired(){
+	event void TimeOut250.fired(){
 		int j=0;
 	
 		for(j=0;j<8;j++) {
 			RSSISaved[j] = RSSIArray[j];
 		}
+		initNodeArray(RSSIArray);
 	
 		printf("-------------------->MobileNode : position (");
 		printfFloat(mobileCoord[time].x);
@@ -107,15 +112,24 @@ implementation {
 		findTopNode();
 		calcDist();
 		getPosition();
-		getError();
+		X += posX; Y += posY;
+		if(cycle %  4 == 3 && cycle != 0) {
+			posX = X / 4.0;
+			posY = Y / 4.0;
+			getError();
+		}
 		
 		//e poi inizializzo per il movimento successivo, cioe' nell'istante di tempo time++
-		initNodeArray(RSSIArray);
 		initNodeArray(RSSISaved);
 		initTopArray(topNode);
 		initDistArray();
 		initErrorDistanceArray();
-		time++;
+		cycle++;
+		if(cycle %  4 == 0) {
+			X = 0; Y = 0;
+			time++;	
+			
+		}
 	}
 
 
@@ -130,10 +144,10 @@ implementation {
 			RSSIArray[sourceNodeId-1].rssiVal = calcRSSI(mess->x,mess->y);
 			RSSIArray[sourceNodeId-1].nodeId = sourceNodeId;
 			printf("RSSI calculated: %d from %d\n",RSSIArray[sourceNodeId-1].rssiVal,sourceNodeId);
-	
-			if(!(call TimeOut.isRunning())) {
-				call TimeOut.startOneShot(MOVE_INTERVAL_MOBILE);
-			}
+			
+			if(!(call TimeOut250.isRunning())) {
+				call TimeOut250.startOneShot(SEND_INTERVAL_ANCHOR-100);
+			}		
 		}
 		return buf;
 	}
@@ -164,7 +178,7 @@ implementation {
 	
 	void initErrorDistanceArray() {
 		int i;
-		for(i=0;i<16;i++) {
+		for(i=0;i<64;i++) {
 			errorDist[i] = -999;
 		}
 	}
@@ -210,7 +224,7 @@ implementation {
 	
 	//
 	float getGaussian() {
-		float var = variance[time]; 
+		float var = variance[cycle]; 
 		//0 e' la media che deve restare nulla perche' detto dalle specifiche
 		float gauss = ( rand_gauss() * var ) + 0;
 		printf("gaussian: ");
@@ -309,15 +323,15 @@ implementation {
 			//che diminuisce col passare del tempo (cioe' all'aumentare delle iterazioni).
 			//Questo per far si che l'algoritmo diventi piu' preciso man mano che si avvicina
 			//alla soluzione. 
-			if(j>3 && j<=10) {
-				alpha = 0.6;
-			} else {
-				if(j>10 && j<=20) {
-					alpha = 0.5;
-				} else {
-					alpha = 0.1;
-				}	
-			}
+//			if(j>3 && j<=10) {
+//				alpha = 0.6;
+//			} else {
+//				if(j>10 && j<=20) {
+//					alpha = 0.5;
+//				} else {
+//					alpha = 0.1;
+//				}	
+//			}
 
 			//calcolo x e y
 			for(i=0;i<3;++i) {
@@ -399,7 +413,7 @@ implementation {
 	float rand_gauss (void) {
 		static float V1, V2, S;
 		static int phase = 0;
-		float X;
+		float Xg;
 
 		if(phase == 0) {
 			do {
@@ -411,13 +425,19 @@ implementation {
 				S = V1 * V1 + V2 * V2;
 			} while(S >= 1 || S == 0);
 
-			X = V1 * sqrtf(-2 * log10f(S) / S);
+			Xg = V1 * sqrtf(-2 * log10f(S) / S);
 		} else
-			X = V2 * sqrtf(-2 * log10f(S) / S);
+			Xg = V2 * sqrtf(-2 * log10f(S) / S);
 
 		phase = 1 - phase;
 
-		return X;
+		return Xg;
 	}
 	
+	void fillVarianceArray() {
+		int i;
+		for (i=0; i < 16; i++) {
+			variance[i] = i/2.5;
+		}
+	}	
 }

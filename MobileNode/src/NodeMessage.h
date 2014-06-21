@@ -50,7 +50,8 @@ coord mobileCoord[16] = {
 #define MOBILE 1
 #define ANCHOR 2
 
-#define MOVE_INTERVAL_MOBILE 1000
+#define MOVE_INTERVAL_MOBILE 4000
+#define SEND_INTERVAL_ANCHOR 1000
 #define AM_RSSIMSG 10
 
 #endif
