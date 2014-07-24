@@ -52,7 +52,8 @@ coord mobileCoord[16] = {
 #define SYNCPACKET 3
 
 #define MOVE_INTERVAL_MOBILE 1000
-#define SEND_INTERVAL_ANCHOR 200
+#define SEND_INTERVAL_ANCHOR 250
+#define RECEIVE_INTERVAL_ANCHOR 150
 #define AM_RSSIMSG 10
 
 #endif

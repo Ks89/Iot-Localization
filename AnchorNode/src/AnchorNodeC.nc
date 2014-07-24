@@ -25,11 +25,12 @@ implementation {
   event void Boot.booted() {
 	printf("Anchor Mote %d booted...\n", TOS_NODE_ID);
 	call RadioControl.start();
+	call Time10Sec.startOneShot(WAIT_BEFORE_SYNC);
   }
   
     //***************** RadioControl interface ********************//
   event void RadioControl.startDone(error_t err){
-  	call Time10Sec.startOneShot(WAIT_BEFORE_SYNC);
+  	
   }
   
   event void RadioControl.stopDone(error_t err){}
@@ -80,10 +81,9 @@ implementation {
 		//prima mando sync, solo se sono l'ancora 1
 		
 		if(TOS_NODE_ID == 1) {
-			sendPacketSync();
-			
+			sendPacketSync();			
 			//dopo avvio broadcast normale
-			call TimeOut.startOneShot(SEND_INTERVAL_ANCHOR);
+			sendPacket();
 		}
 	}
 
@@ -96,7 +96,7 @@ implementation {
 			printf("SyncPacket received");
 			
 			//dopo avvio broadcast normale
-			call TimeOut.startOneShot(SEND_INTERVAL_ANCHOR);
+			sendPacket();
 		}
 		
 		return buf;

@@ -14,6 +14,7 @@ module MobileMoteC {
 		interface Packet;
 		interface Receive;
 		interface Timer<TMilli> as TimeOut250;
+		interface Timer<TMilli> as TimeOut150;
 		interface Random;
 	}
 }
@@ -94,8 +95,12 @@ implementation {
 	event void AMSend.sendDone(message_t* buf,error_t err) {
 	}
 
-
 	event void TimeOut250.fired(){
+		call TimeOut250.startOneShot(SEND_INTERVAL_ANCHOR);
+	}
+	
+	event void TimeOut150.fired() {
+		
 		int j=0;
 	
 		for(j=0;j<8;j++) {
@@ -139,18 +144,18 @@ implementation {
 		nodeMessage_t* mess = (nodeMessage_t*) payload;
 		printf("Message received from %d...\n", sourceNodeId);
 	
-//		if(mess->msg_type == SYNCPACKET) {
-			
-	
 		if ( mess->msg_type == REQ && mess->mode_type == ANCHOR ) {
 	
 			RSSIArray[sourceNodeId-1].rssiVal = calcRSSI(mess->x,mess->y);
 			RSSIArray[sourceNodeId-1].nodeId = sourceNodeId;
 			printf("RSSI calculated: %d from %d\n",RSSIArray[sourceNodeId-1].rssiVal,sourceNodeId);
 			
-			if(!(call TimeOut250.isRunning())) {
-				call TimeOut250.startOneShot(SEND_INTERVAL_ANCHOR);
+			if(!(call TimeOut150.isRunning())) {
+				call TimeOut150.startOneShot(RECEIVE_INTERVAL_ANCHOR);
 			}		
+		}
+		else if(mess->msg_type == SYNCPACKET) {
+			call TimeOut250.startOneShot(SEND_INTERVAL_ANCHOR);
 		}
 		return buf;
 	}
