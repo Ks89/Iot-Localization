@@ -34,6 +34,7 @@ coord anchorCoord[8] = {
 #define SEND_INTERVAL_ANCHOR 250
 #define WAIT_BEFORE_SYNC 10000
 #define AM_RSSIMSG 10
+#define TIMESLOT 10
 
 
 #endif

@@ -13,6 +13,7 @@ module AnchorNodeC {
 	    interface Packet;
 	    interface Timer<TMilli> as TimeOut;
 	    interface Timer<TMilli> as Time10Sec;
+	    interface Timer<TMilli> as Time10;
 	}
 }
 
@@ -37,7 +38,11 @@ implementation {
   
   //***************** MilliTimer interface ********************//
   event void TimeOut.fired() {
-	sendPacket();
+	call Time10.startOneShot(TIMESLOT*TOS_NODE_ID);
+  }
+  
+  event void Time10.fired() {
+  	sendPacket();
   }
   
   //*********************************************************//
@@ -83,7 +88,7 @@ implementation {
 		if(TOS_NODE_ID == 1) {
 			sendPacketSync();			
 			//dopo avvio broadcast normale
-			sendPacket();
+			call Time10.startOneShot(TIMESLOT*TOS_NODE_ID);
 		}
 	}
 
@@ -96,7 +101,7 @@ implementation {
 			printf("SyncPacket received");
 			
 			//dopo avvio broadcast normale
-			sendPacket();
+			call Time10.startOneShot(TIMESLOT*TOS_NODE_ID);
 		}
 		
 		return buf;

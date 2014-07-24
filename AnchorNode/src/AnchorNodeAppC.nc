@@ -12,6 +12,7 @@ implementation {
 	components new AMReceiverC(AM_RSSIMSG);
 	components new TimerMilliC() as TimeOut;
 	components new TimerMilliC() as Time10Sec;
+	components new TimerMilliC() as Time10;
 	components ActiveMessageC;
 	
 	  //Send and Receive interfaces
@@ -27,5 +28,6 @@ implementation {
 	  //Timer interface
 	  App.TimeOut -> TimeOut;
 	  App.Time10Sec -> Time10Sec;
+	  App.Time10 -> Time10;
 
 }
