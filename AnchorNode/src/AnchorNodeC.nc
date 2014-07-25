@@ -22,9 +22,11 @@ implementation {
   void sendPacket();
   
   event void Boot.booted() {
-	printf("Anchor Mote %d booted...\n", TOS_NODE_ID);
+	printf("[ANCHOR %d] Mote booted...\n", TOS_NODE_ID);
 	call RadioControl.start();
-	call Time10Sec.startOneShot(WAIT_BEFORE_SYNC);
+	if(TOS_NODE_ID == 1) {
+		call Time10Sec.startOneShot(WAIT_BEFORE_SYNC);
+	}
   }
   
   event void RadioControl.startDone(error_t err){}
@@ -47,11 +49,11 @@ implementation {
 	mess->x = anchorCoord[TOS_NODE_ID-1].x;
 	mess->y = anchorCoord[TOS_NODE_ID-1].y;
 	 
-	printf("Try to broadcast the message... \n");
+	printf("[ANCHOR %d] Broadcasting beacon... \n", TOS_NODE_ID);
 	call AMSend.send(AM_BROADCAST_ADDR,&packet,sizeof(nodeMessage_t));
 	
 	call TimeOut.startOneShot(SEND_INTERVAL_ANCHOR);
-	printf("Starting new timer...");
+	printf("[ANCHOR %d] Starting timer...", TOS_NODE_ID);
 
   }
  
@@ -61,7 +63,7 @@ implementation {
 	nodeMessage_t* mess = (nodeMessage_t*) (call Packet.getPayload(&packet,sizeof(nodeMessage_t)));
 	mess->msg_type = SYNCPACKET;
 	 
-	printf("Try to broadcast the sync message... \n");
+	printf("[ANCHOR %d] Broadcasting SYNC beacon... \n", TOS_NODE_ID);
 	call AMSend.send(AM_BROADCAST_ADDR,&packet,sizeof(nodeMessage_t));
   }
  
@@ -72,13 +74,10 @@ implementation {
   }
 
 	event void Time10Sec.fired(){
-		//prima mando sync, solo se sono l'ancora 1
-		if(TOS_NODE_ID == 1) {
-			sendPacketSync();			
-			
+			sendPacketSync();					
 			//dopo avvio broadcast normale in TDMA per ancora 1
 			call Time10.startOneShot(TIMESLOT*TOS_NODE_ID);
-		}
+
 	}
 
 	event message_t * Receive.receive(message_t* buf,void* payload, uint8_t len) {
@@ -86,7 +85,7 @@ implementation {
 		nodeMessage_t* mess = (nodeMessage_t*) payload;
 	
 		if ( mess->msg_type == SYNCPACKET) {
-			printf("Anchor %d -> SyncPacket received from anchor %d...\n", TOS_NODE_ID, sourceNodeId);
+			printf("[ANCHOR %d] SYNC Received from anchor %d...\n", TOS_NODE_ID, sourceNodeId);
 			
 			//avvio dopo un tempo definito in modo da creare gli slot
 			//di fatto implementando il TDMA per i nodi restanti

@@ -76,7 +76,7 @@ implementation {
  
 	//***************** Boot interface ********************//
 	event void Boot.booted() {
-		printf("[Mobile] Mobile Mote booted.\n");
+		printf("[MOBILE] Mote booted.\n");
 		initNodeArray(RSSIArray);
 		initNodeArray(RSSISaved);
 		initNodeArray(topNode);
@@ -106,9 +106,7 @@ implementation {
 			RSSISaved[j] = RSSIArray[j];
 		}
 		
-		//initNodeArray(RSSIArray);
-	
-		printf("[Mobile]-------------------->MobileNode : position (");
+		printf("[MOBILE] Node current position (");
 		printfFloat(mobileCoord[time].x);
 		printf(",");
 		printfFloat(mobileCoord[time].y);
@@ -145,12 +143,12 @@ implementation {
 	event message_t* Receive.receive(message_t* buf,void* payload, uint8_t len) {
 		am_addr_t sourceNodeId = call AMPacket.source(buf);	
 		nodeMessage_t* mess = (nodeMessage_t*) payload;
-		printf("[Mobile]Message received from %d... type %d\n", sourceNodeId, mess->msg_type);
+		printf("[MOBILE] Message received from anchor %d... type %d\n", sourceNodeId, mess->msg_type);
 	
 		if ( mess->msg_type == REQ && mess->mode_type == ANCHOR ) {
 			RSSIArray[sourceNodeId-1].rssiVal = calcRSSI(mess->x,mess->y);
 			RSSIArray[sourceNodeId-1].nodeId = sourceNodeId;
-			printf("[Mobile]RSSI calculated: %d from %d\n",RSSIArray[sourceNodeId-1].rssiVal,sourceNodeId);
+			printf("[MOBILE] RSSI calculated: %d from %d\n",RSSIArray[sourceNodeId-1].rssiVal,sourceNodeId);
 			
 			//se gia non sto ricevendo, attivo il timer180
 			if(!(call TimeOut180.isRunning())) {
@@ -199,7 +197,7 @@ implementation {
 	void findTopNode(){
 		int j;
 		for(j=0;j<8;j++) {
-			printf("[Mobile]Node=%d, RSSI=%d\n", RSSISaved[j].nodeId, RSSISaved[j].rssiVal);
+			printf("[MOBILE] Node = %d, RSSI = %d\n", RSSISaved[j].nodeId, RSSISaved[j].rssiVal);
 		}
 	
 		for(j=0; j<8; ++j) {
@@ -220,9 +218,9 @@ implementation {
 			}
 		}
 	
-		printf("[Mobile]Best nodeID = %d with RSSI = %d\n",topNode[0].nodeId,topNode[0].rssiVal);
-		printf("[Mobile]Second nodeID = %d with RSSI = %d\n",topNode[1].nodeId,topNode[1].rssiVal);
-		printf("[Mobile]Third nodeID = %d with RSSI = %d\n",topNode[2].nodeId,topNode[2].rssiVal);
+		printf("[MOBILE] First nodeID = %d with RSSI = %d\n",topNode[0].nodeId,topNode[0].rssiVal);
+		printf("[MOBILE] Second nodeID = %d with RSSI = %d\n",topNode[1].nodeId,topNode[1].rssiVal);
+		printf("[MOBILE] Third nodeID = %d with RSSI = %d\n",topNode[2].nodeId,topNode[2].rssiVal);
 	}
 	
 	int16_t calcRSSI(float x, float y) {
@@ -238,7 +236,7 @@ implementation {
 		float var = variance[cycle]; 
 		//0 e' la media che deve restare nulla perche' detto dalle specifiche
 		float gauss = ( rand_gauss() * var ) + 0;
-		printf("[Mobile]gaussian: ");
+		printf("[MOBILE] Gaussian value: ");
 		printfFloat(gauss);
 		printf("\n");
 		return gauss;
@@ -261,7 +259,7 @@ implementation {
 		//stampo array distanze per vedere i risultati
 		for(i=0;i<3;i++) {
 			if(distArray[i]!=-999) {
-				printf("\n[Mobile]>>>Position in chart %d, distance = ", i+1);
+				printf("\n[MOBILE] Position in chart %d, distance = ", i+1);
 				printfFloat(distArray[i]);
 			}
 		}
@@ -313,7 +311,7 @@ implementation {
 		}
 	
 	
-		printf("[Mobile]Initial position(");
+		printf("[MOBILE] Initial calculated position (");
 		printfFloat(posX);
 		printf(",");
 		printfFloat(posY);
@@ -368,12 +366,12 @@ implementation {
 		//uscito dal while ho i 2 volari di x e y stimati finali
 		//perche' la funzione e' minimizzata, visto che al passo successivo
 		//aumenta, quindi la funzione minimizzata finale e' dentro a functToMinPrev
-		printf("\n[Mobile]MobileNode estimated position=(");
+		printf("\n[MOBILE] Estimated position (");
 		printfFloat(posX);
 		printf(" , ");
 		printfFloat(posY);
 		printf(")\n");
-		printf("[Mobile]Dopo %d iteraz del while\n",j);
+		printf("[MOBILE] After %d WHILE iteration \n",j);
 	}
  
 	//funzione per calcolare l'errore, cioe'  la distanza tra posizione stimata e quella reale (sara' asse y
@@ -381,8 +379,21 @@ implementation {
 	void getError() {
 		errorDist[time] = sqrtf(powf(mobileCoord[time].x - posX,2) 
 				+ powf(mobileCoord[time].y - posY,2));
-				
-		printf("[Mobile]Error: ");
+		
+		
+		printf("[MOBILE] ERROR - Final estimated position (");
+		printfFloat(posX);
+		printf(",");
+		printfFloat(posY);
+		printf(")");
+		
+		printf("[MOBILE] ERROR - Current position (");
+		printfFloat(mobileCoord[time].x);
+		printf(",");
+		printfFloat(mobileCoord[time].y);
+		printf(")");
+		
+		printf("[MOBILE] ERROR - Estimated error: ");
 		printfFloat(errorDist[time]);
 		printf(" at time: %d, with variance: ", time);
 		printfFloat(variance[time]);
