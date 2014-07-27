@@ -103,9 +103,10 @@ implementation {
 	event void TimeOut180.fired() {
 		int j=0;
 		
-		if(time+1 == NUMCOORD) {
+		if(time == NUMCOORD) {
 			sendSwitchOff();
 			call TimeOut250.stop();			
+			return;
 		}
 	
 		for(j=0;j<8;j++) {
