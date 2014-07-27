@@ -24,11 +24,8 @@ coord anchorCoord[8] = {
 	{20, 10}
 };  
 
-#define REQ 1
-#define RESP 2
-
-#define MOBILE 1
-#define ANCHOR 2
+#define BEACON 1
+#define SWITCHOFF 2
 #define SYNCPACKET 3
 
 #define SEND_INTERVAL_ANCHOR 250

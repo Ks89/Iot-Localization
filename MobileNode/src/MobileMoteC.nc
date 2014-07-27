@@ -47,7 +47,7 @@ implementation {
 	float errorDist[24];
 	
 	//----->GRAFICO FINALE = i valori crescenti di varianza che sono fissi
-	float variance[6];
+	float variance[NUMCOORD];
 	
 	//movimento del nodo mobile, ogni istante di tempo (time)
 	//cycle rappresenta la misurazione eseguita nello stesso intervallo di tempo
@@ -72,6 +72,7 @@ implementation {
 	float getGaussian();
 	float rand_gauss();
 	void fillVarianceArray();
+	void sendSwitchOff();
  
  
 	//***************** Boot interface ********************//
@@ -101,6 +102,11 @@ implementation {
 	//Timer di 180 ms in cui il nodo mobile riceve i pacchetti dalle ancore
 	event void TimeOut180.fired() {
 		int j=0;
+		
+		if(time+1 == NUMCOORD) {
+			sendSwitchOff();
+			call TimeOut250.stop();			
+		}
 	
 		for(j=0;j<8;j++) {
 			RSSISaved[j] = RSSIArray[j];
@@ -136,7 +142,17 @@ implementation {
 			time++;	
 		}
 	}
-
+	
+	 //************************Invia pacchetto di switch off*********************************//
+  void sendSwitchOff() {
+	nodeMessage_t* mess = (nodeMessage_t*) (call Packet.getPayload(&packet,sizeof(nodeMessage_t)));
+	mess->msg_type = SWITCHOFF;
+	 
+	printf("[MOBILE] Broadcasting SWITCHOFF beacon... \n");
+	call AMSend.send(AM_BROADCAST_ADDR,&packet,sizeof(nodeMessage_t));
+	call RadioControl.stop();
+  }
+ 
 
 	//***************************** Receive interface *****************//
 	event message_t* Receive.receive(message_t* buf,void* payload, uint8_t len) {
@@ -144,11 +160,11 @@ implementation {
 		nodeMessage_t* mess = (nodeMessage_t*) payload;
 		printf("[MOBILE] Message received from anchor %d... type %d\n", sourceNodeId, mess->msg_type);
 	
-		if ( mess->msg_type == REQ && mess->mode_type == ANCHOR ) {
-			printf("[MOBILE] RSSI calculating: %d from %d\n",RSSIArray[sourceNodeId-1].rssiVal,sourceNodeId);
+		if ( mess->msg_type == BEACON ) {
+			printf("[MOBILE] RSSI Before: %d from %d\n",RSSIArray[sourceNodeId-1].rssiVal,sourceNodeId);
 			RSSIArray[sourceNodeId-1].rssiVal = calcRSSI(mess->x,mess->y);
 			RSSIArray[sourceNodeId-1].nodeId = sourceNodeId;
-			printf("[MOBILE] RSSI CALCULATED: %d from %d\n",RSSIArray[sourceNodeId-1].rssiVal,sourceNodeId);
+			printf("[MOBILE] RSSI Calculated: %d from %d\n",RSSIArray[sourceNodeId-1].rssiVal,sourceNodeId);
 			
 			//se gia non sto ricevendo, attivo il timer180
 			if(!(call TimeOut180.isRunning())) {
@@ -244,7 +260,7 @@ implementation {
 
 		//0 e' la media che deve restare nulla perche' detto dalle specifiche
 		gauss = ( randGauss * var ) + 0;
-		printf("[MOBILE] Gaussian value: ");
+		printf("\n[MOBILE] Gaussian value: ");
 		printfFloat(gauss);
 		printf("\n");
 		return gauss;
@@ -466,8 +482,8 @@ implementation {
 	//dalla funzione getGaussian()
 	void fillVarianceArray() {
 		int i;
-		for (i=0; i < 6; i++) {
-			variance[i] = i/6.0;
+		for (i=1; i <= NUMCOORD; i++) {
+			variance[i-1] = i/(NUMCOORD/4.0);
 		}
 	}	
 }

@@ -24,21 +24,22 @@ coord anchorCoord[8] = {
 	{20, 10}
 };  
 
-coord mobileCoord[6] = {
-	{4, 8},
+#define NUMCOORD 9
+coord mobileCoord[NUMCOORD] = {
+	{6, 6},
 	{8, 8},
-	{12, 8},
-	{12, 10},
-	{15, 8},
-	{22, 8}		
+	{12, 6},
+	{12, 7},
+	{14, 7},
+	{16, 8},
+	{18, 8},
+	{20, 8},
+	{22, 9}		
 };
 
 
-#define REQ 1
-#define RESP 2
-
-#define MOBILE 1
-#define ANCHOR 2
+#define BEACON 1
+#define SWITCHOFF 2
 #define SYNCPACKET 3
 
 #define MOVE_INTERVAL_MOBILE 1000

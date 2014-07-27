@@ -31,7 +31,10 @@ implementation {
   
   event void RadioControl.startDone(error_t err){}
   
-  event void RadioControl.stopDone(error_t err){}
+  event void RadioControl.stopDone(error_t err){
+  	call Time10.stop();
+  	call TimeOut.stop();	
+  }
   
   event void TimeOut.fired() {
 	call Time10.startOneShot(TIMESLOT*TOS_NODE_ID);
@@ -44,8 +47,7 @@ implementation {
   //************************Invia pacchetto al mobile node*********************************//
   void sendPacket() {
 	nodeMessage_t* mess = (nodeMessage_t*) (call Packet.getPayload(&packet,sizeof(nodeMessage_t)));
-	mess->msg_type = REQ;
-	mess->mode_type = ANCHOR;
+	mess->msg_type = BEACON;
 	mess->x = anchorCoord[TOS_NODE_ID-1].x;
 	mess->y = anchorCoord[TOS_NODE_ID-1].y;
 	 
@@ -90,6 +92,13 @@ implementation {
 			//avvio dopo un tempo definito in modo da creare gli slot
 			//di fatto implementando il TDMA per i nodi restanti
 			call Time10.startOneShot(TIMESLOT*TOS_NODE_ID);
+		}
+		else if( mess->msg_type == SWITCHOFF)  {
+			printf("[ANCHOR %d] SWITCHOFF Received from anchor %d...\n", TOS_NODE_ID, sourceNodeId);
+			printf("[ANCHOR %d] Radio switching off...\n", TOS_NODE_ID);
+			call RadioControl.stop();
+			call TimeOut.stop();
+			call Time10.stop();
 		}
 		return buf;
 	}
