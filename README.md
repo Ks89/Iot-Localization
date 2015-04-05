@@ -1,4 +1,4 @@
-# Localization of a Mobile Node with a Wireless Sensor Network 
+# Localization of a Mobile Node with a WSN
 Project for the course called "Internet of Things" at Politecnico di Milano.
 
 ## Objectives
