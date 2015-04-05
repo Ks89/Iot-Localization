@@ -60,14 +60,12 @@ The plot with the localization error on Y and the Gaussian noise variance on X i
 ```
 7. In Cooja, load the ".csc" file in the released ".zip", and click on the "Start" button to start the simulation.
 
-
-## Images
-
-Simulations running
-
 ![alt tag](http://www.stefanocappa.it/publicfiles/Github_repositories_images/IotLocalization/2-cooja-running.png)
 
 
+## Images
+
+TODO TODO
 
 ## License
 
