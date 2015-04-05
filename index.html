@@ -24,12 +24,12 @@
       <div id="banner">
         <span id="logo"></span>
 
-        <a href="https://github.com/Ks89/iot-localization" class="button fork"><strong>View On GitHub</strong></a>
+        <a href="https://github.com/Ks89/Iot-Localization" class="button fork"><strong>View On GitHub</strong></a>
         <div class="downloads">
           <span>Downloads:</span>
           <ul>
-            <li><a href="https://github.com/Ks89/iot-localization/zipball/master" class="button">ZIP</a></li>
-            <li><a href="https://github.com/Ks89/iot-localization/tarball/master" class="button">TAR</a></li>
+            <li><a href="https://github.com/Ks89/Iot-Localization/zipball/master" class="button">ZIP</a></li>
+            <li><a href="https://github.com/Ks89/Iot-Localization/tarball/master" class="button">TAR</a></li>
           </ul>
         </div>
       </div><!-- end banner -->
@@ -42,7 +42,7 @@
         <h1>
 <a id="localization-of-a-mobile-node-with-a-wireless-sensor-network" class="anchor" href="#localization-of-a-mobile-node-with-a-wireless-sensor-network" aria-hidden="true"><span class="octicon octicon-link"></span></a>Localization of a Mobile Node with a Wireless Sensor Network</h1>
 
-<p>Project for the course of Internet of Things (2014) at Politecnico di Milano.</p>
+<p>Project for the course called "Internet of Things" at Politecnico di Milano.</p>
 
 <h2>
 <a id="objectives" class="anchor" href="#objectives" aria-hidden="true"><span class="octicon octicon-link"></span></a>Objectives</h2>
@@ -68,6 +68,9 @@ The anchors periodically broadcast beacons, which are received by the mobile nod
 <p><img src="http://www.stefanocappa.it/publicfiles/Github_repositories_images/IotLocalization/1-results.png" alt="alt tag">
 <br>
 <img src="http://www.stefanocappa.it/publicfiles/Github_repositories_images/IotLocalization/3-cooja-results.png" alt="alt tag"></p>
+
+<h2>
+<a id="video" class="anchor" href="#video" aria-hidden="true"><span class="octicon octicon-link"></span></a>Video</h2>
 
 <h2>
 <a id="news" class="anchor" href="#news" aria-hidden="true"><span class="octicon octicon-link"></span></a>News</h2>
@@ -98,13 +101,10 @@ The anchors periodically broadcast beacons, which are received by the mobile nod
 <h2>
 <a id="usage" class="anchor" href="#usage" aria-hidden="true"><span class="octicon octicon-link"></span></a>Usage</h2>
 
-<ol>
-<li>Download the Instant Contiki VM <a href="http://sourceforge.net/projects/contiki/files/Instant%20Contiki/">HERE</a>.</li>
-<li>If you want to compile this softwares with Eclipse, download Eclipse C++ <a href="https://eclipse.org/">HERE</a>.</li>
-<li>In the VM, download the ".zip" file from the page "Releases" of this project.</li>
-<li>Download in ~/git this source code with: git clone  </li>
-<li>Execute these commands:</li>
-</ol>
+<p><strong>Step 1.</strong> Download Instant Contiki VM <a href="http://sourceforge.net/projects/contiki/files/Instant%20Contiki/">HERE</a>.<br>
+<strong>Step 2.</strong> In the VM, download the ".zip" file from the page "Releases" of this project.<br>
+<strong>Step 3.</strong> Download in ~/git this source code with: git clone  <br>
+<strong>Step 4.</strong> Execute these commands:</p>
 
 <div class="highlight highlight-bash"><pre>    $ <span class="pl-c1">cd</span> <span class="pl-k">~</span>/git/<span class="pl-k">&lt;</span>name of this project<span class="pl-k">&gt;</span>/AnchorNode
     $ mkdir build
@@ -115,35 +115,42 @@ The anchors periodically broadcast beacons, which are received by the mobile nod
     $ <span class="pl-c1">cd</span> build
     $ mkdir telosb</pre></div>
 
-<ol>
-<li>In the downloaded files extracted from the ".zip" copy Binary-files/AnchorNode/main.exe in </li>
-</ol>
+<p><strong>Step 5.</strong> In the downloaded files extracted from the ".zip" copy Binary-files/AnchorNode/main.exe in </p>
 
 <div class="highlight highlight-bash"><pre>    $ cp <span class="pl-k">~</span>/Downloads/<span class="pl-k">&lt;</span>extracted files folder<span class="pl-k">&gt;</span>/Binary-files/AnchorNode/build/telosb/main.exe <span class="pl-k">~</span>/git/<span class="pl-k">&lt;</span>name of this project<span class="pl-k">&gt;</span>/AnchorNode/build/telosb/main.exe
     $ cp <span class="pl-k">~</span>/Downloads/<span class="pl-k">&lt;</span>extracted files folder<span class="pl-k">&gt;</span>/Binary-files/MobileNode/build/telosb/main.exe <span class="pl-k">~</span>/git/<span class="pl-k">&lt;</span>name of this project<span class="pl-k">&gt;</span>/MobileNode/build/telosb/main.exe</pre></div>
 
-<ol>
-<li>Run Cooja with:</li>
-</ol>
+<p><strong>Step 6.</strong> Run Cooja with:</p>
 
 <div class="highlight highlight-bash"><pre>    $ <span class="pl-c1">cd</span> <span class="pl-k">~</span>/contiki-2.7/tools/cooja
     $ ant run</pre></div>
 
-<ol>
-<li>In Cooja, load the ".csc" file in the released ".zip", and click on the "Start" button to start the simulation.</li>
-</ol>
-
-<h2>
-<a id="images" class="anchor" href="#images" aria-hidden="true"><span class="octicon octicon-link"></span></a>Images</h2>
-
-<p>Simulations running</p>
+<p><strong>Step 7.</strong> In Cooja, load the ".csc" file in the released ".zip", and click on the "Start" button to start the simulation.</p>
 
 <p><img src="http://www.stefanocappa.it/publicfiles/Github_repositories_images/IotLocalization/2-cooja-running.png" alt="alt tag"></p>
 
 <h2>
+<a id="eclipse-instructions" class="anchor" href="#eclipse-instructions" aria-hidden="true"><span class="octicon octicon-link"></span></a>Eclipse instructions</h2>
+
+<p><strong>Step 1.</strong> If you want to compile this softwares with Eclipse, download Eclipse C++ <a href="https://eclipse.org/">HERE</a>.<br>
+<strong>Step 2.</strong> Intall Yeti 2 Plugin, using this "Software Site": <a href="http://tos-ide.ethz.ch/update/site.xml">http://tos-ide.ethz.ch/update/site.xml</a><br>
+<strong>Step 3.</strong> Import AnchorNode from the downloaded files in ~/git//AnchorNode in a project<br>
+<strong>Step 4.</strong> Import MobileNode from the downloaded files in ~/git//MobileNode in a different project<br>
+<strong>Step 5.</strong> Initialize the VM to download TinyOS using this tutrial <a href="http://tinyprod.net/repos/debian/">http://tinyprod.net/repos/debian/</a> <br>
+<strong>Step 6.</strong> Download TinyOS using this tutorial <a href="http://tinyos.stanford.edu/tinyos-wiki/index.php/Automatic_installation">http://tinyos.stanford.edu/tinyos-wiki/index.php/Automatic_installation</a><br>
+<strong>Step 7.</strong> Restart Eclipse, go in Window-&gt;Preferences-&gt;TinyOS-&gt;Environments-&gt;TinyOS 2.x unix-environment and set the path of "TinyOS Root Directory"
+<br><br>
+<img src="http://www.stefanocappa.it/publicfiles/Github_repositories_images/IotLocalization/4-eclipse-preferences.png" alt="alt tag">
+<br><br>
+<strong>Step 8.</strong> Include "printf.h" in Project-&gt;Properties-&gt;TinyOS Build-&gt;2.Includes and check that ncc=consider and Include=system<br>
+<strong>Step 9.</strong> Include "math.h" in Eclipse only in the MobileNode's project.
+<br><br>
+<img src="http://www.stefanocappa.it/publicfiles/Github_repositories_images/IotLocalization/5-eclipse-include.png" alt="alt tag"></p>
+
+<h2>
 <a id="license" class="anchor" href="#license" aria-hidden="true"><span class="octicon octicon-link"></span></a>License</h2>
 
-<p>Copyright 2014-2015 Stefano Cappa, Jiang Wu, Eric Oswald Scarpulla (for Politecnico di Milano)</p>
+<p>Copyright 2014-2015 Stefano Cappa, Jiang Wu, Eric Oswald Scarpulla</p>
 
 <p>Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
