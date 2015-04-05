@@ -1,0 +1,171 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>IOT Localization by Ks89</title>
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script src="javascripts/main.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+  </head>
+  <body>
+
+      <header>
+        <h1>IOT Localization</h1>
+        <p></p>
+      </header>
+
+      <div id="banner">
+        <span id="logo"></span>
+
+        <a href="https://github.com/Ks89/iot-localization" class="button fork"><strong>View On GitHub</strong></a>
+        <div class="downloads">
+          <span>Downloads:</span>
+          <ul>
+            <li><a href="https://github.com/Ks89/iot-localization/zipball/master" class="button">ZIP</a></li>
+            <li><a href="https://github.com/Ks89/iot-localization/tarball/master" class="button">TAR</a></li>
+          </ul>
+        </div>
+      </div><!-- end banner -->
+
+    <div class="wrapper">
+      <nav>
+        <ul></ul>
+      </nav>
+      <section>
+        <h1>
+<a id="localization-of-a-mobile-node-with-a-wireless-sensor-network" class="anchor" href="#localization-of-a-mobile-node-with-a-wireless-sensor-network" aria-hidden="true"><span class="octicon octicon-link"></span></a>Localization of a Mobile Node with a Wireless Sensor Network</h1>
+
+<p>Project for the course of Internet of Things (2014) at Politecnico di Milano.</p>
+
+<h2>
+<a id="objectives" class="anchor" href="#objectives" aria-hidden="true"><span class="octicon octicon-link"></span></a>Objectives</h2>
+
+<p>Simulate a WSN composed by 8 fixed anchors and a mobile node, which moves along a known trajectory (of your choice).<br>
+The anchors periodically broadcast beacons, which are received by the mobile node. Upon reception, the mobile node estimates the RSSs of the beacons, converts it into distance measures and triangulates its position by using the best three beacons.</p>
+
+<h3>
+<a id="requirements" class="anchor" href="#requirements" aria-hidden="true"><span class="octicon octicon-link"></span></a>Requirements:</h3>
+
+<ol>
+<li>Create a specific component to simulate RSS estimation. The component acts as an oracle, knowing the trajectory of the mobile node and the position of all the anchors. Use a log-distance path loss model for power-to-distance conversion, e.g. P = P0 + 10log10(d/d0) + v, with v an additive Gaussian noise of known distance.</li>
+<li>From the estimated RSSI, retrieve a distance measure (only for the best 3 anchor nodes).</li>
+<li>Use the Gradient Descent triangulation techniques to obtain the position of the mobile node.</li>
+<li>Compute and plot the localization error VS the Gaussian noise variance v.</li>
+</ol>
+
+<h2>
+<a id="results" class="anchor" href="#results" aria-hidden="true"><span class="octicon octicon-link"></span></a>Results</h2>
+
+<p>The plot with the localization error on Y and the Gaussian noise variance on X is:</p>
+
+<p><img src="http://www.stefanocappa.it/publicfiles/Github_repositories_images/IotLocalization/1-results.png" alt="alt tag">
+<br>
+<img src="http://www.stefanocappa.it/publicfiles/Github_repositories_images/IotLocalization/3-cooja-results.png" alt="alt tag"></p>
+
+<h2>
+<a id="news" class="anchor" href="#news" aria-hidden="true"><span class="octicon octicon-link"></span></a>News</h2>
+
+<ul>
+<li>
+<em>04/05/2015</em> - <strong>IOT Localization</strong> 1.0.0 released</li>
+</ul>
+
+<h2>
+<a id="contents" class="anchor" href="#contents" aria-hidden="true"><span class="octicon octicon-link"></span></a>Contents</h2>
+
+<ul>
+<li>2 projects in one repository. AnchoreNode and MobileNode projects for Eclipse (with Yeti 2 TinyOS plugin).</li>
+<li>Sources</li>
+<li>Binary files ready to use</li>
+<li>Report of the project and the ".csc" simulation's files for Cooja</li>
+<li>Log file</li>
+</ul>
+
+<h2>
+<a id="future-extensions" class="anchor" href="#future-extensions" aria-hidden="true"><span class="octicon octicon-link"></span></a>Future extensions</h2>
+
+<ul>
+<li>[ ] Test this software on real sensors.</li>
+</ul>
+
+<h2>
+<a id="usage" class="anchor" href="#usage" aria-hidden="true"><span class="octicon octicon-link"></span></a>Usage</h2>
+
+<ol>
+<li>Download the Instant Contiki VM <a href="http://sourceforge.net/projects/contiki/files/Instant%20Contiki/">HERE</a>.</li>
+<li>If you want to compile this softwares with Eclipse, download Eclipse C++ <a href="https://eclipse.org/">HERE</a>.</li>
+<li>In the VM, download the ".zip" file from the page "Releases" of this project.</li>
+<li>Download in ~/git this source code with: git clone  </li>
+<li>Execute these commands:</li>
+</ol>
+
+<div class="highlight highlight-bash"><pre>    $ <span class="pl-c1">cd</span> <span class="pl-k">~</span>/git/<span class="pl-k">&lt;</span>name of this project<span class="pl-k">&gt;</span>/AnchorNode
+    $ mkdir build
+    $ <span class="pl-c1">cd</span> build
+    $ mkdir telosb
+    $ <span class="pl-c1">cd</span> <span class="pl-k">~</span>/git/<span class="pl-k">&lt;</span>name of this project<span class="pl-k">&gt;</span>/MobileNode
+    $ mkdir build
+    $ <span class="pl-c1">cd</span> build
+    $ mkdir telosb</pre></div>
+
+<ol>
+<li>In the downloaded files extracted from the ".zip" copy Binary-files/AnchorNode/main.exe in </li>
+</ol>
+
+<div class="highlight highlight-bash"><pre>    $ cp <span class="pl-k">~</span>/Downloads/<span class="pl-k">&lt;</span>extracted files folder<span class="pl-k">&gt;</span>/Binary-files/AnchorNode/build/telosb/main.exe <span class="pl-k">~</span>/git/<span class="pl-k">&lt;</span>name of this project<span class="pl-k">&gt;</span>/AnchorNode/build/telosb/main.exe
+    $ cp <span class="pl-k">~</span>/Downloads/<span class="pl-k">&lt;</span>extracted files folder<span class="pl-k">&gt;</span>/Binary-files/MobileNode/build/telosb/main.exe <span class="pl-k">~</span>/git/<span class="pl-k">&lt;</span>name of this project<span class="pl-k">&gt;</span>/MobileNode/build/telosb/main.exe</pre></div>
+
+<ol>
+<li>Run Cooja with:</li>
+</ol>
+
+<div class="highlight highlight-bash"><pre>    $ <span class="pl-c1">cd</span> <span class="pl-k">~</span>/contiki-2.7/tools/cooja
+    $ ant run</pre></div>
+
+<ol>
+<li>In Cooja, load the ".csc" file in the released ".zip", and click on the "Start" button to start the simulation.</li>
+</ol>
+
+<h2>
+<a id="images" class="anchor" href="#images" aria-hidden="true"><span class="octicon octicon-link"></span></a>Images</h2>
+
+<p>Simulations running</p>
+
+<p><img src="http://www.stefanocappa.it/publicfiles/Github_repositories_images/IotLocalization/2-cooja-running.png" alt="alt tag"></p>
+
+<h2>
+<a id="license" class="anchor" href="#license" aria-hidden="true"><span class="octicon octicon-link"></span></a>License</h2>
+
+<p>Copyright 2014-2015 Stefano Cappa, Jiang Wu, Eric Oswald Scarpulla (for Politecnico di Milano)</p>
+
+<p>Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at</p>
+
+<pre><code>http://www.apache.org/licenses/LICENSE-2.0
+</code></pre>
+
+<p>Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.</p>
+
+<p><strong>Created by Stefano Cappa, Jiang Wu, Eric Scarpulla</strong></p>
+      </section>
+      <footer>
+        <p>Project maintained by <a href="https://github.com/Ks89">Ks89</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://twitter.com/michigangraham">mattgraham</a></small></p>
+      </footer>
+    </div>
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+    
+  </body>
+</html>
