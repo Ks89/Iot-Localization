@@ -1,5 +1,5 @@
 # Localization of a Mobile Node with a Wireless Sensor Network 
-Project for the course of Internet of Things (2014) at Politecnico di Milano.
+Project for the course called "Internet of Things" at Politecnico di Milano.
 
 ## Objectives
 Simulate a WSN composed by 8 fixed anchors and a mobile node, which moves along a known trajectory (of your choice).<br>
