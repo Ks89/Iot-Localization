@@ -19,6 +19,9 @@ The plot with the localization error on Y and the Gaussian noise variance on X i
 ![alt tag](http://www.stefanocappa.it/publicfiles/Github_repositories_images/IotLocalization/3-cooja-results.png)
 
 
+## Video
+
+
 ## News
 - *04/05/2015* - **IOT Localization** 1.0.0 released
 
@@ -33,10 +36,10 @@ The plot with the localization error on Y and the Gaussian noise variance on X i
 - [ ] Test this software on real sensors.
 
 ## Usage
-Step 1. Download Instant Contiki VM [HERE](http://sourceforge.net/projects/contiki/files/Instant%20Contiki/).<br>
-Step 2. In the VM, download the ".zip" file from the page "Releases" of this project.<br>
-Step 3. Download in ~/git this source code with: git clone <link https of this project> <br>
-Step 4. Execute these commands:
+**Step 1.** Download Instant Contiki VM [HERE](http://sourceforge.net/projects/contiki/files/Instant%20Contiki/).<br>
+**Step 2.** In the VM, download the ".zip" file from the page "Releases" of this project.<br>
+**Step 3.** Download in ~/git this source code with: git clone <link https of this project> <br>
+**Step 4.** Execute these commands:
 ```bash
     $ cd ~/git/<name of this project>/AnchorNode
     $ mkdir build
@@ -47,40 +50,36 @@ Step 4. Execute these commands:
     $ cd build
     $ mkdir telosb
 ```
-Step 5. In the downloaded files extracted from the ".zip" copy Binary-files/AnchorNode/main.exe in 
+**Step 5.** In the downloaded files extracted from the ".zip" copy Binary-files/AnchorNode/main.exe in 
 ```bash
     $ cp ~/Downloads/<extracted files folder>/Binary-files/AnchorNode/build/telosb/main.exe ~/git/<name of this project>/AnchorNode/build/telosb/main.exe
     $ cp ~/Downloads/<extracted files folder>/Binary-files/MobileNode/build/telosb/main.exe ~/git/<name of this project>/MobileNode/build/telosb/main.exe
 ```
-Step 6. Run Cooja with:
+**Step 6.** Run Cooja with:
 ```bash
     $ cd ~/contiki-2.7/tools/cooja
     $ ant run
 ```
-Step 7. In Cooja, load the ".csc" file in the released ".zip", and click on the "Start" button to start the simulation.
+**Step 7.** In Cooja, load the ".csc" file in the released ".zip", and click on the "Start" button to start the simulation.
 
 ![alt tag](http://www.stefanocappa.it/publicfiles/Github_repositories_images/IotLocalization/2-cooja-running.png)
 
 ## Eclipse instructions
-Step 1. If you want to compile this softwares with Eclipse, download Eclipse C++ [HERE](https://eclipse.org/).<br>
-Step 2. Intall Yeti 2 Plugin, using this "Software Site": http://tos-ide.ethz.ch/update/site.xml<br>
-Step 3. Import AnchorNode from the downloaded files in ~/git/<name of this project>/AnchorNode in a project<br>
-Step 4. Import MobileNode from the downloaded files in ~/git/<name of this project>/MobileNode in a different project<br>
-Step 5. Initialize the VM to download TinyOS using this tutrial http://tinyprod.net/repos/debian/ and <br>
-Step 6. Download TinyOS using this tutorial http://tinyos.stanford.edu/tinyos-wiki/index.php/Automatic_installation<br>
-Step 7. Restart Eclipse, go in Window->Preferences->TinyOS->Environments->TinyOS 2.x unix-environment and set the path of "TinyOS Root Directory"
+**Step 1.** If you want to compile this softwares with Eclipse, download Eclipse C++ [HERE](https://eclipse.org/).<br>
+**Step 2.** Intall Yeti 2 Plugin, using this "Software Site": http://tos-ide.ethz.ch/update/site.xml<br>
+**Step 3.** Import AnchorNode from the downloaded files in ~/git/<name of this project>/AnchorNode in a project<br>
+**Step 4.** Import MobileNode from the downloaded files in ~/git/<name of this project>/MobileNode in a different project<br>
+**Step 5.** Initialize the VM to download TinyOS using this tutrial http://tinyprod.net/repos/debian/ and <br>
+**Step 6.** Download TinyOS using this tutorial http://tinyos.stanford.edu/tinyos-wiki/index.php/Automatic_installation<br>
+**Step 7.** Restart Eclipse, go in Window->Preferences->TinyOS->Environments->TinyOS 2.x unix-environment and set the path of "TinyOS Root Directory"
 <br><br>
 ![alt tag](http://www.stefanocappa.it/publicfiles/Github_repositories_images/IotLocalization/4-eclipse-preferences.png)
 <br><br>
-Step 8. Include "printf.h" in Project->Properties->TinyOS Build->2.Includes and check that ncc=consider and Include=system<br>
-Step 9. Include "math.h" in Eclipse only in the MobileNode's project.
+**Step 8.** Include "printf.h" in Project->Properties->TinyOS Build->2.Includes and check that ncc=consider and Include=system<br>
+**Step 9.** Include "math.h" in Eclipse only in the MobileNode's project.
 <br><br>
 ![alt tag](http://www.stefanocappa.it/publicfiles/Github_repositories_images/IotLocalization/5-eclipse-include.png)
 
-
-## Images
-
-TODO TODO
 
 ## License
 
