@@ -20,6 +20,7 @@ The plot with the localization error on Y and the Gaussian noise variance on X i
 
 
 ## Video
+[![ScreenShot](http://www.stefanocappa.it/publicfiles/Github_repositories_images/IotLocalization/youtube.png)](https://www.youtube.com/watch?v=3bZJ61tfQDw)
 
 
 ## News
