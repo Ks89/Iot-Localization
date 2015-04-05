@@ -69,7 +69,7 @@ The plot with the localization error on Y and the Gaussian noise variance on X i
 **Step 2.** Intall Yeti 2 Plugin, using this "Software Site": http://tos-ide.ethz.ch/update/site.xml<br>
 **Step 3.** Import AnchorNode from the downloaded files in ~/git/<name of this project>/AnchorNode in a project<br>
 **Step 4.** Import MobileNode from the downloaded files in ~/git/<name of this project>/MobileNode in a different project<br>
-**Step 5.** Initialize the VM to download TinyOS using this tutrial http://tinyprod.net/repos/debian/ and <br>
+**Step 5.** Initialize the VM to download TinyOS using this tutrial http://tinyprod.net/repos/debian/ <br>
 **Step 6.** Download TinyOS using this tutorial http://tinyos.stanford.edu/tinyos-wiki/index.php/Automatic_installation<br>
 **Step 7.** Restart Eclipse, go in Window->Preferences->TinyOS->Environments->TinyOS 2.x unix-environment and set the path of "TinyOS Root Directory"
 <br><br>
