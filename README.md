@@ -15,6 +15,9 @@ The anchors periodically broadcast beacons, which are received by the mobile nod
 The plot with the localization error on Y and the Gaussian noise variance on X is:
 
 ![alt tag](http://www.stefanocappa.it/publicfiles/Github_repositories_images/IotLocalization/1-results.png)
+<br>
+![alt tag](http://www.stefanocappa.it/publicfiles/Github_repositories_images/IotLocalization/3-cooja-results.png)
+
 
 ## News
 - *04/05/2015* - **IOT Localization** 1.0.0 released
@@ -60,8 +63,11 @@ The plot with the localization error on Y and the Gaussian noise variance on X i
 
 ## Images
 
+Simulations running
 
-## Important things
+![alt tag](http://www.stefanocappa.it/publicfiles/Github_repositories_images/IotLocalization/2-cooja-running.png)
+
+
 
 ## License
 
