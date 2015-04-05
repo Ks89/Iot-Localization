@@ -71,7 +71,7 @@ Simulations running
 
 ## License
 
-Copyright 2014-2015 Stefano Cappa, Jiang Wu, Eric Oswald Scarpulla (for Politecnico di Milano)
+Copyright 2014-2015 Stefano Cappa, Jiang Wu, Eric Oswald Scarpulla
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
