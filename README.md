@@ -2,12 +2,12 @@
 Project for the course called "Internet of Things" at Politecnico di Milano.
 
 ## Objectives
-Simulate a WSN composed by 8 fixed anchors and a mobile node, which moves along a known trajectory (of your choice).<br>
-The anchors periodically broadcast beacons, which are received by the mobile node. Upon reception, the mobile node estimates the RSSs of the beacons, converts it into distance measures and triangulates its position by using the best three beacons.
+Simulate a WSN composed by 8 fixed anchors and 1 mobile node, which moves along a known path.<br>
+The anchors periodically broadcast beacons, which are received by the mobile node. Upon reception, the mobile node estimates the RSSI of the beacons, converts it into distance measures and triangulates its position by using the best three beacons.
 ### Requirements:
-1. Create a specific component to simulate RSS estimation. The component acts as an oracle, knowing the trajectory of the mobile node and the position of all the anchors. Use a log-distance path loss model for power-to-distance conversion, e.g. P = P0 + 10log10(d/d0) + v, with v an additive Gaussian noise of known distance.
+1. Create a specific component to simulate RSSI estimation. The component acts as an oracle, knowing the trajectory of the mobile node and the position of all the anchors. Use a log-distance path loss model for power-to-distance conversion, e.g. P = P0 + 10log10(d/d0) + v, with v an additive Gaussian noise of known distance.
 2. From the estimated RSSI, retrieve a distance measure (only for the best 3 anchor nodes).
-3. Use the Gradient Descent triangulation techniques to obtain the position of the mobile node.
+3. Use the Gradient Descent Triangulation techniques to obtain the position of the mobile node.
 4. Compute and plot the localization error VS the Gaussian noise variance v.
 
 ## Results
@@ -27,7 +27,7 @@ The plot with the localization error on Y and the Gaussian noise variance on X i
 - *04/05/2015* - **IOT Localization** 1.0.0 released
 
 ## Contents
-- 2 projects in one repository. AnchoreNode and MobileNode projects for Eclipse (with Yeti 2 TinyOS plugin).
+- 2 projects in one repository. AnchorNode and MobileNode projects for Eclipse (with Yeti 2 TinyOS plugin).
 - Sources
 - Binary files ready to use
 - Report of the project and the ".csc" simulation's files for Cooja
@@ -70,7 +70,7 @@ The plot with the localization error on Y and the Gaussian noise variance on X i
 **Step 2.** Intall Yeti 2 Plugin, using this "Software Site": http://tos-ide.ethz.ch/update/site.xml<br>
 **Step 3.** Import AnchorNode from the downloaded files in ~/git/<name of this project>/AnchorNode in a project<br>
 **Step 4.** Import MobileNode from the downloaded files in ~/git/<name of this project>/MobileNode in a different project<br>
-**Step 5.** Initialize the VM to download TinyOS using this tutrial http://tinyprod.net/repos/debian/ <br>
+**Step 5.** Initialize the VM to download TinyOS using this tutorial http://tinyprod.net/repos/debian/ <br>
 **Step 6.** Download TinyOS using this tutorial http://tinyos.stanford.edu/tinyos-wiki/index.php/Automatic_installation<br>
 **Step 7.** Restart Eclipse, go in Window->Preferences->TinyOS->Environments->TinyOS 2.x unix-environment and set the path of "TinyOS Root Directory"
 <br><br>
